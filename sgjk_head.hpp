@@ -49,8 +49,6 @@
 #define SGJK__3D_OPER_VEC_MUT(oper) template<class ScalarType> vec3T<ScalarType>& operator oper (vec3T<ScalarType>& vec, const vec3T<ScalarType>& other) noexcept { vec.x oper other.x; vec.y oper other.y; vec.z oper other.z; return vec;}
 #define SGJK__3D_OPER_VEC_CONST(oper) template<class ScalarType> [[nodiscard]] vec3T<ScalarType> operator oper (const vec3T<ScalarType>& vec, const vec3T<ScalarType>& other) noexcept { return vec3T<ScalarType>(vec.x oper other.x, vec.y oper other.y, vec.z oper other.z); }
 
-//#define SGJK__GET_VECTOR_COSTEXPR_SIZE(vecT__) (sizeof(vecT__) / sizeof(vecT__::value_type))
-
 namespace sgjk  {
     namespace linear {
         /**
@@ -381,7 +379,7 @@ namespace sgjk  {
             [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction) const noexcept override { return collider_.get_furthest_point(direction); };
             [[nodiscard]] math_vector_type get_some_point() const noexcept override { return collider_.get_some_point();};
             [[nodiscard]] bool is_valid() const noexcept override { return collider_.is_valid();};
-            collider_wrapper_support* clone() const override { return new collider_wrapper_support_t(*this);};
+            [[nodiscard]] collider_wrapper_support* clone() const override { return new collider_wrapper_support_t(*this);};
 
         };
 
@@ -523,7 +521,6 @@ namespace sgjk  {
     /// @brief specialization of polygon_collider_anydt for 3d.
     typedef polygon_collider_anydt<SGJK_DEFAULT_VEC3D> polygon_collider_3d;
 
-
     /**
      * @brief a circle collider for any dimension.
      *
@@ -582,6 +579,16 @@ namespace sgjk  {
     /// @brief specialization of circle_collider_anydt for 3d.
     typedef circle_collider_anydt<SGJK_DEFAULT_VEC3D> circle_collider_3d;
 
+
+    template<class FirstColliderT_, class SecondColliderT_>
+    [[nodiscard]] static typename FirstColliderT_::math_vector_type support(
+            const FirstColliderT_& first,
+            const SecondColliderT_& second,
+            const typename FirstColliderT_::math_vector_type& direction) {
+        static_assert(is_realy_the_same<typename FirstColliderT_::math_vector_type, typename SecondColliderT_::math_vector_type>::value, "FirstColliderT_::math_vector_type and SecondColliderT_::math_vector_type must be equal");
+        return first.get_furthest_point(direction) - second.get_furthest_point(-direction);
+    }
+
     /**
      * @brief a collision detector for 2D vectors.
      *
@@ -595,16 +602,7 @@ namespace sgjk  {
         
         private:
         SGJK_SIZE_TYPE iteration_;
-
-        private:
-        template<class FirstColliderT_, class SecondColliderT_>
-        [[nodiscard]] math_vector2d support(
-                const FirstColliderT_& first,
-                const SecondColliderT_& second,
-                const math_vector2d& direction) {
-
-            return first.get_furthest_point(direction) - second.get_furthest_point(-direction);
-        }
+        math_vector2d simplex_[3u];
 
         public:
         /**  
@@ -630,27 +628,22 @@ namespace sgjk  {
             math_vector2d direction = first.get_some_point() - second.get_some_point();
             if (SGJK_LENGTH(direction) == (scalar_type)0)
                 return true;
-            math_vector2d simplex[3u] {
-                math_vector2d(),
-                math_vector2d(),
-                math_vector2d()
-            };
 
-            simplex[0u] = support(first, second, direction);
-            direction = -simplex[0u];
+            simplex_[0u] = support(first, second, direction);
+            direction = -simplex_[0u];
 
             SGJK_SIZE_TYPE simplex_size = 1;
 
             for (; iteration_ < maxIterationCount; ++iteration_) { // faster, then 'while' on any optimization
-                simplex[simplex_size] = support(first, second, direction);
+                simplex_[simplex_size] = support(first, second, direction);
 
-                if (SGJK_DOT(simplex[simplex_size], direction) <= (scalar_type)0) // Oposite direction
+                if (SGJK_DOT(simplex_[simplex_size], direction) <= (scalar_type)0) // Oposite direction
                     return false;
 
                 ++simplex_size;
                 if (simplex_size == 2) {
-                    const math_vector2d& a = simplex[1];
-                    const math_vector2d& b = simplex[0];
+                    const math_vector2d& a = simplex_[1];
+                    const math_vector2d& b = simplex_[0];
 
                     const math_vector2d ab = b - a;
                     const math_vector2d ao = -a;
@@ -665,9 +658,9 @@ namespace sgjk  {
                 } else if (simplex_size == 3) {
                     // why are they reversed? idk lol
 
-                    const math_vector2d& a = simplex[2];
-                    const math_vector2d& b = simplex[1];
-                    const math_vector2d& c = simplex[0];
+                    const math_vector2d& a = simplex_[2];
+                    const math_vector2d& b = simplex_[1];
+                    const math_vector2d& c = simplex_[0];
  
                     const math_vector2d ao = -a;
                     const math_vector2d ab = b - a;
@@ -680,10 +673,10 @@ namespace sgjk  {
                         direction = abPerp;
                         simplex_size = 2;
                     } else if (SGJK_DOT(acPerp, ao) > (scalar_type)0) { // Same direction
-                        simplex[1] = c;
+                        simplex_[1] = c;
                         simplex_size = 2;
                         direction = acPerp;
-                    } else { // In simplex
+                    } else { // In simplex_
                         return true;
                     }
                 } else {
@@ -722,6 +715,9 @@ namespace sgjk  {
         [[nodiscard]] SGJK_SIZE_TYPE get_iteration_count() const noexcept {
             return iteration_ + 1;
         }
+        [[nodiscard]] const math_vector2d* get_simplex_data() const noexcept {
+            return simplex_;
+        }
     };
     typedef collision_detecter_2dt<SGJK_DEFAULT_VEC2D> collision_detecter_2d;
 
@@ -733,16 +729,8 @@ namespace sgjk  {
 
         private:
         SGJK_SIZE_TYPE iteration_;
+        math_vector3d simplex_[4u];
 
-        private:
-        template<class FirstColliderT_, class SecondColliderT_>
-        [[nodiscard]] math_vector3d support(
-                const FirstColliderT_& first,
-                const SecondColliderT_& second,
-                const math_vector3d& direction) {
-
-            return first.get_furthest_point(direction) - second.get_furthest_point(-direction);
-        }
         public:
         /**  
          * @brief Checks for collision between 3D colliders. Does not check the validity of the colliders before starting the algorithm.
@@ -768,42 +756,35 @@ namespace sgjk  {
             if (SGJK_LENGTH(direction) <= (scalar_type)0)
                 return true;
 
-            math_vector3d simplex[4u] {
-                math_vector3d(),
-                math_vector3d(),
-                math_vector3d(),
-                math_vector3d()
-            };
-
-            simplex[0] = support(first, second, direction);
+            simplex_[0] = support(first, second, direction);
             SGJK_SIZE_TYPE simplex_size = 1;
 
-            direction = -simplex[0];
+            direction = -simplex_[0];
 
             for (; iteration_ < maxIterationCount; ++iteration_) {
-                simplex[simplex_size] = support(first, second, direction);
-                if (SGJK_DOT(simplex[simplex_size], direction) < (scalar_type)0)
+                simplex_[simplex_size] = support(first, second, direction);
+                if (SGJK_DOT(simplex_[simplex_size], direction) < (scalar_type)0)
                     return false;
 
                 ++simplex_size;
 
                 if (simplex_size == 2) {
-                    const math_vector3d& a = simplex[0];
-                    const math_vector3d& b = simplex[1];
+                    const math_vector3d& a = simplex_[0];
+                    const math_vector3d& b = simplex_[1];
                     const math_vector3d ab = b - a;
                     const math_vector3d ao = -a;
 
                     if (SGJK_DOT(ab, ao) >= 0) {
                         direction = SGJK_CROSS(SGJK_CROSS(ab, ao), ab);
                     } else {
-                        simplex[0] = b;
+                        simplex_[0] = b;
                         direction = ao;
                         simplex_size = 1;
                     }
                 } else if (simplex_size == 3) {
-                    const math_vector3d& a = simplex[0];
-                    const math_vector3d& b = simplex[1];
-                    const math_vector3d& c = simplex[2];
+                    const math_vector3d& a = simplex_[0];
+                    const math_vector3d& b = simplex_[1];
+                    const math_vector3d& c = simplex_[2];
                     const math_vector3d ao = -a;
                     const math_vector3d ab = b - a;
                     const math_vector3d ac = c - a;
@@ -818,10 +799,10 @@ namespace sgjk  {
                         direction = abc;
                     }
                 } else if (simplex_size == 4) {
-                    const math_vector3d& a = simplex[0];
-                    const math_vector3d& b = simplex[1];
-                    const math_vector3d& c = simplex[2];
-                    const math_vector3d& d = simplex[3];
+                    const math_vector3d& a = simplex_[0];
+                    const math_vector3d& b = simplex_[1];
+                    const math_vector3d& c = simplex_[2];
+                    const math_vector3d& d = simplex_[3];
                     const math_vector3d ao = -a;
                     const math_vector3d ab = b - a;
                     const math_vector3d ac = c - a;
@@ -835,22 +816,22 @@ namespace sgjk  {
                         direction = abc;
                         simplex_size = 3;
                     } else if (SGJK_DOT(acd, ao) > (scalar_type)0) { // Same direction
-                        simplex[1] = c;
-                        simplex[2] = d;
+                        simplex_[1] = c;
+                        simplex_[2] = d;
                         direction = acd;
                         simplex_size = 3;
                     } else if (SGJK_DOT(adb, ao) > (scalar_type)0) { // Same direction
-                        simplex[1] = d;
-                        simplex[2] = b;
+                        simplex_[1] = d;
+                        simplex_[2] = b;
                         direction = adb;
                         simplex_size = 3;
                     } else if (SGJK_DOT(bcd, ao) > (scalar_type)0) { // Same direction
-                        simplex[0] = b;
-                        simplex[1] = c;
-                        simplex[2] = d;
+                        simplex_[0] = b;
+                        simplex_[1] = c;
+                        simplex_[2] = d;
                         direction = bcd;
                         simplex_size = 3;
-                    } else { // In simplex
+                    } else { // In simplex_
                         return true;
                     }
                 } else {
@@ -888,6 +869,9 @@ namespace sgjk  {
         }
         [[nodiscard]] SGJK_SIZE_TYPE get_iteration_count() const noexcept {
             return iteration_ + 1;
+        }
+        [[nodiscard]] const math_vector3d* get_simplex_data() const noexcept {
+            return simplex_;
         }
     };
     typedef collision_detecter_3dt<SGJK_DEFAULT_VEC3D> collision_detecter_3d;
