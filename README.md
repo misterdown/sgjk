@@ -35,7 +35,6 @@ By default, SGJK uses the standard `assert` macro for assertions. You can overri
 
 ```cpp
 #define SGJK_ASSERT(expr__) your_custom_assert(expr__)
-#include "sgjk_head.hpp"
 ```
 
 #### Default Container
@@ -83,9 +82,7 @@ SGJK provides default implementations for mathematical operations such as `dot`,
 ```
 
 By customizing these macros, you can avoid dependencies and tailor the SGJK library to your specific needs.
-```cpp
-#include "sgjk_head.hpp"
-```
+
 ## Usage
 
 ### Vector Operations
@@ -93,10 +90,10 @@ By customizing these macros, you can avoid dependencies and tailor the SGJK libr
 SGJK provides a `vec2T` and `vec3T` template class for 2D and 3D vectors, respectively. These classes support various mathematical operations such as addition, subtraction, dot product, cross product, and normalization.
 
 ```cpp
-sgjk::linear::vec2<float> v1(1.0f, 2.0f);
-sgjk::linear::vec2<float> v2(3.0f, 4.0f);
+sgjk::linear::vec2 v1(1.0f, 2.0f);
+sgjk::linear::vec2 v2(3.0f, 4.0f);
 
-sgjk::linear::vec2<float> v3 = v1 + v2;
+sgjk::linear::vec2 v3 = v1 + v2;
 float dotProduct = sgjk::linear::dot(v1, v2);
 ```
 
@@ -107,7 +104,7 @@ SGJK provides predefined colliders for polygons, circles and wapper for any coll
 #### Polygon Collider
 
 ```cpp
-std::vector<sgjk::linear::vec2<float>> vertices = {
+std::vector<sgjk::linear::vec2> vertices = {
     sgjk::linear::vec2(0.0f, 0.0f),
     sgjk::linear::vec2(1.0f, 0.0f),
     sgjk::linear::vec2(1.0f, 1.0f),
@@ -120,7 +117,7 @@ sgjk::polygon_collider_2d polygonCollider(vertices);
 #### Circle Collider
 
 ```cpp
-sgjk::linear::vec2<float> center(0.0f, 0.0f);
+sgjk::linear::vec2 center(0.0f, 0.0f);
 float radius = 1.0f;
 
 sgjk::circle_collider_2d circleCollider(center, radius);
@@ -128,7 +125,7 @@ sgjk::circle_collider_2d circleCollider(center, radius);
 #### Wrapper
 
 ```cpp
-std::vector<sgjk::linear::vec2<float>> vertices = {
+std::vector<sgjk::linear::vec2> vertices = {
     sgjk::linear::vec2(0.0f, 0.0f),
     sgjk::linear::vec2(1.0f, 0.0f),
     sgjk::linear::vec2(1.0f, 1.0f),
@@ -136,7 +133,7 @@ std::vector<sgjk::linear::vec2<float>> vertices = {
 };
 sgjk::polygon_collider_2d polygonCollider(vertices);
 
-sgjk::linear::vec2<float> center(0.0f, 0.0f);
+sgjk::linear::vec2 center(0.0f, 0.0f);
 float radius = 1.0f;
 sgjk::circle_collider_2d circleCollider(center, radius);
 
@@ -163,29 +160,29 @@ bool isColliding = collisionDetector.is_collide(polygonCollider, circleCollider)
 #include <iostream>
 
 int main() {
-    const std::vector<sgjk::linear::vec2<float>> vertices1{
+    const std::vector<sgjk::linear::vec2> vertices1{
         sgjk::linear::vec2(0.0f, 0.0f),
         sgjk::linear::vec2(1.0f, 0.0f),
         sgjk::linear::vec2(1.0f, 1.0f),
         sgjk::linear::vec2(0.0f, 1.0f)
     };
 
-    const std::vector<sgjk::linear::vec2<float>> vertices2{
+    const std::vector<sgjk::linear::vec2> vertices2{
         sgjk::linear::vec2(2.0f, 2.0f),
         sgjk::linear::vec2(3.0f, 2.0f),
         sgjk::linear::vec2(3.0f, 3.0f),
         sgjk::linear::vec2(2.0f, 3.0f)
     };
 
-    sgjk::polygon_collider_2d polygon1(vertices1);
-    sgjk::polygon_collider_2d polygon2(vertices2);
+    sgjk::polygon_collider_2d collider1(vertices1);
+    sgjk::polygon_collider_2d collider2(vertices2);
 
     sgjk::collision_detecter_2d collisionDetector;
 
-    if (collisionDetector.is_collide(polygon1, polygon2)) {
-        std::cout << "Shapes intersect" << std::endl;
+    if (collisionDetector.is_collide(collider1, collider2)) {
+        std::cout << "Shapes intersect\n";
     } else {
-        std::cout << "Shapes do not intersect" << std::endl;
+        std::cout << "Shapes do not intersect\n";
     }
 
     return 0;
@@ -199,7 +196,7 @@ int main() {
 #include <iostream>
 
 int main() {
-    const std::vector<sgjk::linear::vec3<float>> vertices1{
+    const std::vector<sgjk::linear::vec3> vertices1{
         sgjk::linear::vec2(0.0f, 0.0f, 0.0f),
         sgjk::linear::vec2(1.0f, 0.0f, 0.0f),
         sgjk::linear::vec2(1.0f, 1.0f, 0.0f),
@@ -209,16 +206,18 @@ int main() {
         sgjk::linear::vec2(1.0f, 1.0f, 1.0f),
         sgjk::linear::vec2(0.0f, 1.0f, 1.0f)
     };
+    sgjk::polygon_collider_3d collider1(vertices1);
 
-    sgjk::polygon_collider_3d polygon1(vertices1);
-    sgjk::polygon_collider_3d circle1(sgjk::linear::vec2(0.0f), 1.0f);
+    sgjk::linear::vec3 center(0.0f);
+    float radius = 1.0f;
+    sgjk::circle_collider_3d collider2(center, radius);
 
     sgjk::collision_detecter_3d collisionDetector;
 
-    if (collisionDetector.is_collide(polygon1, polygon2)) {
-        std::cout << "Shapes intersect" << std::endl;
+    if (collisionDetector.is_collide(collider1, collider2)) {
+        std::cout << "Shapes intersect\n";
     } else {
-        std::cout << "Shapes do not intersect" << std::endl;
+        std::cout << "Shapes do not intersect\n";
     }
 
     return 0;
@@ -229,18 +228,21 @@ int main() {
 ```cpp
 int main() {
     const std::vector<sgjk::vec2> vertices{
-        sgjk::linear::vec2(0.81f),
-        sgjk::linear::vec2(0.81f, -0.81f),
-        sgjk::linear::vec2(0.81f, 0.81f),
-        sgjk::linear::vec2(-0.81f),
-    }; 
-    sgjk::collider_wrapper_2d collider1 = sgjk::circle_collider_2d(sgjk::linear::vec2(0.01f, 0.0f), 5.0f);
+        sgjk::linear::vec2(0.1f),
+        sgjk::linear::vec2(0.1f, -0.1f),
+        sgjk::linear::vec2(-0.1f, 0.1f),
+        sgjk::linear::vec2(-0.1f),
+    };
+    sgjk::linear::vec2 center(0.0f);
+    float radius = 1.0f;
+
+    sgjk::collider_wrapper_2d collider1 = sgjk::circle_collider_2d(center, radius);
     sgjk::collider_wrapper_2d collider2 = sgjk::polygon_collider_2d(vertices);
 
     if (collisionDetector.is_collide(collider1, collider2)) {
-        std::cout << "Shapes intersect" << std::endl;
+        std::cout << "Shapes intersect\n";
     } else {
-        std::cout << "Shapes do not intersect" << std::endl;
+        std::cout << "Shapes do not intersect\n";
     }
     
     return 0;
