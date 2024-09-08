@@ -76,17 +76,25 @@ void basic_second_collision_test() {
 
 void basic_thrird_collision_test() {
     sgjk::polygon_collider_2d collider1(sgjk::polygon_collider_2d({
-        sgjk::linear::vec2(0.05f),
-        sgjk::linear::vec2(-0.05f, 0.05f),
-        sgjk::linear::vec2(-0.05f),
-        sgjk::linear::vec2(0.05f, -0.05f),
+        sgjk::linear::vec2(1.0f),
+        sgjk::linear::vec2(-1.0f, 1.0f),
+        sgjk::linear::vec2(-1.0f), 
     }));
+    /*
+     * ._.
+     * |/
+     * `
+     */
     sgjk::polygon_collider_2d collider2(sgjk::polygon_collider_2d({
-        sgjk::linear::vec2(0.1f),
-        sgjk::linear::vec2(-0.1f, 0.1f),
-        sgjk::linear::vec2(-0.1f),
-        sgjk::linear::vec2(0.1f, -0.1f),
+        sgjk::linear::vec2(1.0f),
+        sgjk::linear::vec2(-1.0f, 1.0f),
+        sgjk::linear::vec2(1.0f, -1.0), 
     }));
+    /*
+     * ._.
+     *  \|
+     *   `
+     */
 
     sgjk::collision_detecter_2d collisionDetector;
     if (collisionDetector.is_collide(collider1, collider2)) {
