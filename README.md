@@ -1,6 +1,6 @@
 # SGJK: Simple GJK Collision Detection Library
 
-SGJK is a C++ library for collision detection using the Gilbert-Johnson-Keerthi (GJK) algorithm. This library provides a flexible and efficient way to detect collisions between convex shapes in both 2D and 3D spaces.
+SGJK is a single .hpp file C++11 library for collision detection using the Gilbert-Johnson-Keerthi (GJK) algorithm. This library provides a flexible and efficient way to detect collisions between convex shapes in both 2D and 3D spaces.
 
 - [Features](#features)
 - [Installation](#installation)
