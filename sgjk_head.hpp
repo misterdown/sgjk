@@ -21,14 +21,19 @@
 #   define SGJK_SIZE_TYPE size_t // long long a BIT faster with O2 or O3
 #endif // !defined SGJK_MOVE
 
-#if (!(defined SGKJ_NOT_IMPLEMENT_VECTORS))
+#if (!(defined SGJK_MAX_VALUE_OF))
+#   include <limits>
+#   define SGJK_MAX_VALUE_OF(T__) (::std::numeric_limits<T__>::max())
+#endif // !defined SGJK_MAX_VALUE_OF
 
+#if (!(defined SGKJ_NOT_IMPLEMENT_VECTORS)) /////////////////////////////////////////////////////////////
 #if (!(defined SGJK_DEFAULT_VEC2D))
 #      define SGJK_DEFAULT_VEC2D ::sgjk::linear::vec2
 #   endif // !defined SGJK_VEC2D
 #   if (!(defined SGJK_DEFAULT_VEC3D))
 #      define SGJK_DEFAULT_VEC3D ::sgjk::linear::vec3
 #endif // !defined SGJK_VEC3D
+
 
 #if (!(defined SGJK_SQRT))
 #   include <cmath>
@@ -41,6 +46,7 @@
     template<class ScalarType> [[nodiscard]] vec2T<ScalarType> operator oper (const ScalarType& scalar, const vec2T<ScalarType>& vec) noexcept { return vec2T<ScalarType>(scalar oper vec.x, scalar oper vec.y); }
 #define SGJK__2D_OPER_VEC_MUT(oper) template<class ScalarType> vec2T<ScalarType>& operator oper (vec2T<ScalarType>& vec, const vec2T<ScalarType>& other) noexcept { vec.x oper other.x; vec.y oper other.y; return vec;}
 #define SGJK__2D_OPER_VEC_CONST(oper) template<class ScalarType> [[nodiscard]] vec2T<ScalarType> operator oper (const vec2T<ScalarType>& vec, const vec2T<ScalarType>& other) noexcept { return vec2T<ScalarType>(vec.x oper other.x, vec.y oper other.y); }
+#define SGJK__2D_OPER_VEC_BOOL(oper, del) template<class ScalarType> [[nodiscard]] bool operator oper (const vec2T<ScalarType>& left, const vec2T<ScalarType>& rigth) noexcept { return ((left.x oper rigth.x) del (left.y oper rigth.y));}
 
 #define SGJK__3D_OPER_SCALAR_MUT(oper) template<class ScalarType> vec3T<ScalarType>& operator oper (vec3T<ScalarType>& vec, const ScalarType& scalar) noexcept { vec.x oper scalar; vec.y oper scalar; vec.z oper scalar; return vec;}
 #define SGJK__3D_OPER_SCALAR_CONST(oper) \
@@ -48,6 +54,7 @@
     template<class ScalarType> [[nodiscard]] vec3T<ScalarType> operator oper (const ScalarType& scalar, const vec3T<ScalarType>& vec) noexcept { return vec3T<ScalarType>(scalar oper vec.x, scalar oper vec.y, scalar oper vec.z); }
 #define SGJK__3D_OPER_VEC_MUT(oper) template<class ScalarType> vec3T<ScalarType>& operator oper (vec3T<ScalarType>& vec, const vec3T<ScalarType>& other) noexcept { vec.x oper other.x; vec.y oper other.y; vec.z oper other.z; return vec;}
 #define SGJK__3D_OPER_VEC_CONST(oper) template<class ScalarType> [[nodiscard]] vec3T<ScalarType> operator oper (const vec3T<ScalarType>& vec, const vec3T<ScalarType>& other) noexcept { return vec3T<ScalarType>(vec.x oper other.x, vec.y oper other.y, vec.z oper other.z); }
+#define SGJK__3D_OPER_VEC_BOOL(oper, del) template<class ScalarType> [[nodiscard]] bool operator oper (const vec3T<ScalarType>& left, const vec3T<ScalarType>& rigth) noexcept { return ((left.x oper rigth.x) del (left.y oper rigth.y) del (left.z oper rigth.z));}
 
 namespace sgjk  {
     namespace linear {
@@ -118,6 +125,17 @@ namespace sgjk  {
             // no differens on O0
         }
         /**
+         * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector.
+         */
+        template<class ScalarType>
+        void normalize(vec2T<ScalarType>& vec) noexcept {
+            const ScalarType len = length(vec);
+            if (len == (ScalarType)0)
+                return;
+            vec.x /= len;
+            vec.y /= len;
+        }
+        /**
          * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector. @return The normalized vector.
          */
         template<class ScalarType>
@@ -152,6 +170,9 @@ namespace sgjk  {
         SGJK__2D_OPER_VEC_CONST(-)
         SGJK__2D_OPER_VEC_CONST(*)
         SGJK__2D_OPER_VEC_CONST(/)
+
+        SGJK__2D_OPER_VEC_BOOL(==, &&);
+        SGJK__2D_OPER_VEC_BOOL(!=, ||);
         
         template<class ScalarType>
         [[nodiscard]] vec2T<ScalarType> operator-(const vec2T<ScalarType>& vec) noexcept {
@@ -223,6 +244,18 @@ namespace sgjk  {
             return SGJK_SQRT(dot(vec, vec));
         }
         /**
+         * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector.
+         */
+        template<class ScalarType>
+        void normalize(vec3T<ScalarType>& vec) noexcept {
+            const ScalarType len = length(vec);
+            if (len == (ScalarType)0)
+                return;
+            vec.x /= len;
+            vec.y /= len;
+            vec.z /= len;
+        }
+        /**
          * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector. @return The normalized vector.
          */
         template<class ScalarType>
@@ -261,6 +294,9 @@ namespace sgjk  {
         SGJK__3D_OPER_VEC_CONST(-)
         SGJK__3D_OPER_VEC_CONST(*)
         SGJK__3D_OPER_VEC_CONST(/)
+
+        SGJK__3D_OPER_VEC_BOOL(==, &&);
+        SGJK__3D_OPER_VEC_BOOL(!=, ||);
         
         template<class ScalarType>
         [[nodiscard]] vec3T<ScalarType> operator-(const vec3T<ScalarType>& vec) noexcept {
@@ -278,6 +314,9 @@ namespace sgjk  {
 #if (!(defined SGJK_LENGTH))
 #   define SGJK_LENGTH(vec__) (::sgjk::linear::length(vec__)) // define default length.
 #endif // !defined SGJK_LENGTH
+#if (!(defined SGJK_NORMALIZE))
+#   define SGJK_NORMALIZE(vec__) (::sgjk::linear::normalize(vec__)) // define default normalize.
+#endif // !defined SGJK_NORMALIZE
 #if (!(defined SGJK_NORMALIZED))
 #   define SGJK_NORMALIZED(vec__) (::sgjk::linear::normalized(vec__)) // define default normalized.
 #endif // !defined SGJK_NORMALIZED
@@ -300,6 +339,9 @@ namespace sgjk  {
 #if (!(defined SGJK_LENGTH))
     static_assert(false, "define own SGJK_LENGTH");
 #endif // !defined SGJK_LENGTH
+#if (!(defined SGJK_NORMALIZE))
+#   define SGJK_NORMALIZE(vec__) (::sgjk::linear::normalize(vec__)) // define default normalized.
+#endif // !defined SGJK_NORMALIZE
 #if (!(defined SGJK_NORMALIZED))
     static_assert(false, "define own SGJK_NORMALIZED");
 #endif // !defined SGJK_NORMALIZED
@@ -606,7 +648,7 @@ namespace sgjk  {
 
         public:
         /**  
-         * @brief Checks for collision between 2D colliders. Does not check the validity of the colliders before starting the algorithm.
+         * @brief Checks for collision between 2D colliders. Does not check the validity of the colliders before starting the algorithm. Check 'is_collide' for safety.
          * 
          * @tparam FirstCollider2DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
          * @tparam SecondCollider2DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
@@ -623,61 +665,63 @@ namespace sgjk  {
 
             static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector2d>::value,  "vector types must be the same");
             static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector2d>::value, "vector types must be the same");
-            
+
+            /// Оно работает ПОДОЗРИТЕЛЬНО ХОРОШО. Мне СТРАШНО. TODO: Сделать этот метод хуже
+            // GJK не должен находить правильный ответ с 1 итерации гарантировано, с моим кодом что-то явно не так.
+
             iteration_ = 0;
+
             math_vector2d direction = first.get_some_point() - second.get_some_point();
-            if (SGJK_LENGTH(direction) == (scalar_type)0)
+            if (direction == math_vector2d(0, 0)) { // if colliders intersect, then simplex must be valid. Fill simplex with something. 
+                simplex_[0] = support(first, second, direction);
+                simplex_[1] = support(first, second, -simplex_[0]);
+                const math_vector2d ab = simplex_[1] - simplex_[0];
+                math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
+                if (SGJK_DOT(abPerp, -simplex_[0]) < (scalar_type)0)
+                    abPerp = -abPerp;
+                simplex_[2] = support(first, second, abPerp);
                 return true;
+            }
+            math_vector2d supportPoint = support(first, second, direction);
+            simplex_[0] = supportPoint;
+            SGJK_SIZE_TYPE simplexSize = 1;
+            direction = -supportPoint;
 
-            simplex_[0u] = support(first, second, direction);
-            direction = -simplex_[0u];
-
-            SGJK_SIZE_TYPE simplex_size = 1;
-
-            for (; iteration_ < maxIterationCount; ++iteration_) { // faster, then 'while' on any optimization
-                simplex_[simplex_size] = support(first, second, direction);
-
-                if (SGJK_DOT(simplex_[simplex_size], direction) <= (scalar_type)0) // Oposite direction
+            for (; iteration_ < maxIterationCount; ++iteration_) {
+                supportPoint = support(first, second, direction);
+                if (SGJK_DOT(supportPoint, direction) <= (scalar_type)0)
                     return false;
+                simplex_[simplexSize] = supportPoint;
+                ++simplexSize;
+                if (simplexSize == 2) {
+                    const math_vector2d ao = -simplex_[0];
+                    const math_vector2d ab = simplex_[1] - simplex_[0];
+                    math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
+                    if (SGJK_DOT(abPerp, ao) < (scalar_type)0)
+                        abPerp = -abPerp;
+                    direction = abPerp;
 
-                ++simplex_size;
-                if (simplex_size == 2) {
-                    const math_vector2d& a = simplex_[1];
-                    const math_vector2d& b = simplex_[0];
+                } else if (simplexSize == 3) {
+                    const math_vector2d ab = simplex_[1] - simplex_[0];
+                    const math_vector2d ao = -simplex_[0];
+                    const math_vector2d bc = simplex_[2] - simplex_[1];
+                    const math_vector2d bo = -simplex_[1];
+                    const math_vector2d ca = simplex_[0] - simplex_[2];
+                    const math_vector2d co = -simplex_[2];
 
-                    const math_vector2d ab = b - a;
-                    const math_vector2d ao = -a;
-
-                    const math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
-
-                    if (SGJK_DOT(abPerp, ao) > (scalar_type)0) {// Same direction
-                        direction = abPerp;
-                    } else {
-                        direction = ao;
-                    }
-                } else if (simplex_size == 3) {
-                    // why are they reversed? idk lol
-
-                    const math_vector2d& a = simplex_[2];
-                    const math_vector2d& b = simplex_[1];
-                    const math_vector2d& c = simplex_[0];
- 
-                    const math_vector2d ao = -a;
-                    const math_vector2d ab = b - a;
-                    const math_vector2d ac = c - a;
-
-                    const math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
-                    const math_vector2d acPerp = math_vector2d(-ac.y, ac.x);
-
-                    if (SGJK_DOT(abPerp, ao) > (scalar_type)0) { // Same direction
-                        direction = abPerp;
-                        simplex_size = 2;
-                    } else if (SGJK_DOT(acPerp, ao) > (scalar_type)0) { // Same direction
-                        simplex_[1] = c;
-                        simplex_size = 2;
-                        direction = acPerp;
-                    } else { // In simplex_
+                    if ((SGJK_CROSS(ab, ao) >= (scalar_type)0 && SGJK_CROSS(bc, bo) >= (scalar_type)0 && SGJK_CROSS(ca, co) >= (scalar_type)0) ||
+                        (SGJK_CROSS(ab, ao) <= (scalar_type)0 && SGJK_CROSS(bc, bo) <= (scalar_type)0 && SGJK_CROSS(ca, co) <= (scalar_type)0)) {
                         return true;
+                    } else {
+                        //simplex_[0] = simplex_[2];
+                        //simplexSize = 2;
+                        //const math_vector2d ao = -simplex_[0];
+                        //const math_vector2d ab = simplex_[1] - simplex_[0];
+                        //math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
+                        //if (SGJK_DOT(abPerp, ao) < (scalar_type)0)
+                        //    abPerp = -abPerp;
+                        //direction = abPerp;
+                        return false;
                     }
                 } else {
                     SGJK_ASSERT(false);
@@ -712,6 +756,60 @@ namespace sgjk  {
 
             return is_collide_unsafe(first, second, maxIterationCount);
         }
+        template<class FirstCollider2DT_, class SecondCollider2DT_>
+        [[nodiscard]] math_vector2d get_penetration_vector_unsafe(
+            const FirstCollider2DT_& first,
+            const SecondCollider2DT_& second, 
+            const scalar_type toleranceDistance = 0.001,
+            const SGJK_SIZE_TYPE maxIterationCount = 16) {
+
+            static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector2d>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector2d>::value, "vector types must be the same");
+
+            iteration_ = 0;
+
+            SGJK_SIZE_TYPE minIndex = 0;
+            scalar_type minDistance = SGJK_MAX_VALUE_OF(scalar_type);
+            math_vector2d minNormal;
+
+            SGJK_DEFAULT_CONTAINER<math_vector2d> polytope(simplex_, simplex_ + 3);
+
+            for (; (iteration_ < maxIterationCount) && (minDistance == SGJK_MAX_VALUE_OF(scalar_type)); ++iteration_) {
+                for (SGJK_SIZE_TYPE i = 0; i < polytope.size(); ++i) {
+                    SGJK_SIZE_TYPE j = (i + 1) % polytope.size();
+
+                    const math_vector2d vertexI = polytope[i];
+                    const math_vector2d vertexJ = polytope[j];
+
+                    const math_vector2d ij = vertexJ - vertexI;
+
+                    math_vector2d normal = SGJK_NORMALIZED(math_vector2d(-ij.y, ij.x));
+                    scalar_type distance = SGJK_DOT(normal, vertexI);
+
+                    if (distance < (scalar_type)0) {
+                        distance = -distance;
+                        normal = -normal;
+                    }
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        minNormal = normal;
+                        minIndex = j;
+                    }
+                }
+                const math_vector2d supportPoint = support(first, second, minNormal);
+                const scalar_type sDistance = SGJK_DOT(minNormal, supportPoint);
+
+                if (::std::abs(sDistance - minDistance) > toleranceDistance) {
+                    minDistance = SGJK_MAX_VALUE_OF(scalar_type);
+                    polytope.insert(polytope.begin() + minIndex, {supportPoint});
+                }
+            }
+            
+
+            return minNormal * (minDistance + toleranceDistance);
+        }
+
         [[nodiscard]] SGJK_SIZE_TYPE get_iteration_count() const noexcept {
             return iteration_ + 1;
         }
@@ -720,161 +818,6 @@ namespace sgjk  {
         }
     };
     typedef collision_detecter_2dt<SGJK_DEFAULT_VEC2D> collision_detecter_2d;
-
-    template<class MathVector3DT_>
-    struct collision_detecter_3dt final {
-        private:
-        typedef MathVector3DT_ math_vector3d;
-        typedef typename MathVector3DT_::value_type scalar_type;
-
-        private:
-        SGJK_SIZE_TYPE iteration_;
-        math_vector3d simplex_[4u];
-
-        public:
-        /**  
-         * @brief Checks for collision between 3D colliders. Does not check the validity of the colliders before starting the algorithm.
-         * 
-         * @tparam FirstCollider3DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider3DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @param first first collider.
-         * @param second second collider.
-         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
-         * @return Whether a collision is present.
-         */ 
-        template<class FirstCollider3DT_, class SecondCollider3DT_>
-        [[nodiscard]] bool is_collide_unsafe(
-            const FirstCollider3DT_& first,
-            const SecondCollider3DT_& second,
-            const SGJK_SIZE_TYPE maxIterationCount = 32) {
-
-            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
-
-            iteration_ = 0;
-            math_vector3d direction = first.get_some_point() - second.get_some_point();
-            if (SGJK_LENGTH(direction) <= (scalar_type)0)
-                return true;
-
-            simplex_[0] = support(first, second, direction);
-            SGJK_SIZE_TYPE simplex_size = 1;
-
-            direction = -simplex_[0];
-
-            for (; iteration_ < maxIterationCount; ++iteration_) {
-                simplex_[simplex_size] = support(first, second, direction);
-                if (SGJK_DOT(simplex_[simplex_size], direction) < (scalar_type)0)
-                    return false;
-
-                ++simplex_size;
-
-                if (simplex_size == 2) {
-                    const math_vector3d& a = simplex_[0];
-                    const math_vector3d& b = simplex_[1];
-                    const math_vector3d ab = b - a;
-                    const math_vector3d ao = -a;
-
-                    if (SGJK_DOT(ab, ao) >= 0) {
-                        direction = SGJK_CROSS(SGJK_CROSS(ab, ao), ab);
-                    } else {
-                        simplex_[0] = b;
-                        direction = ao;
-                        simplex_size = 1;
-                    }
-                } else if (simplex_size == 3) {
-                    const math_vector3d& a = simplex_[0];
-                    const math_vector3d& b = simplex_[1];
-                    const math_vector3d& c = simplex_[2];
-                    const math_vector3d ao = -a;
-                    const math_vector3d ab = b - a;
-                    const math_vector3d ac = c - a;
-                    const math_vector3d abc = SGJK_CROSS(ab, ac);
-
-                    if (SGJK_DOT(SGJK_CROSS(abc, ac), ao) >= 0) {
-                        direction = SGJK_CROSS(abc, ac);
-                    } else if (SGJK_DOT(SGJK_CROSS(ab, abc), ao) >= 0) {
-                        direction = SGJK_CROSS(ab, abc);
-                    } else {
-                        simplex_size = 2;
-                        direction = abc;
-                    }
-                } else if (simplex_size == 4) {
-                    const math_vector3d& a = simplex_[0];
-                    const math_vector3d& b = simplex_[1];
-                    const math_vector3d& c = simplex_[2];
-                    const math_vector3d& d = simplex_[3];
-                    const math_vector3d ao = -a;
-                    const math_vector3d ab = b - a;
-                    const math_vector3d ac = c - a;
-                    const math_vector3d ad = d - a;
-                    const math_vector3d abc = SGJK_CROSS(ab, ac);
-                    const math_vector3d acd = SGJK_CROSS(ac, ad);
-                    const math_vector3d adb = SGJK_CROSS(ad, ab);
-                    const math_vector3d bcd = SGJK_CROSS(c - b, d - b);
-
-                    if (SGJK_DOT(abc, ao) > (scalar_type)0) { // Same direction
-                        direction = abc;
-                        simplex_size = 3;
-                    } else if (SGJK_DOT(acd, ao) > (scalar_type)0) { // Same direction
-                        simplex_[1] = c;
-                        simplex_[2] = d;
-                        direction = acd;
-                        simplex_size = 3;
-                    } else if (SGJK_DOT(adb, ao) > (scalar_type)0) { // Same direction
-                        simplex_[1] = d;
-                        simplex_[2] = b;
-                        direction = adb;
-                        simplex_size = 3;
-                    } else if (SGJK_DOT(bcd, ao) > (scalar_type)0) { // Same direction
-                        simplex_[0] = b;
-                        simplex_[1] = c;
-                        simplex_[2] = d;
-                        direction = bcd;
-                        simplex_size = 3;
-                    } else { // In simplex_
-                        return true;
-                    }
-                } else {
-                    SGJK_ASSERT(false);
-                     return false;
-                }
-            }
-            return false;
-        }
-         /**  
-         * @brief Checks for collision between 3D colliders. Checks the validity of the colliders before starting the algorithm.
-         * 
-         * @tparam FirstCollider3DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider3DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @param first first collider.
-         * @param second second collider.
-         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
-         * @return Whether a collision is present.
-         */ 
-        template<class FirstCollider3DT_, class SecondCollider3DT_>
-        [[nodiscard]] bool is_collide(
-            const FirstCollider3DT_& first,
-            const SecondCollider3DT_& second,
-            const SGJK_SIZE_TYPE maxIterationCount = 32) {
-
-            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
-
-            if (!(first.is_valid() && second.is_valid())) {
-                iteration_ = 0;
-                return false;
-            }
-
-            return is_collide_unsafe(first, second, maxIterationCount);
-        }
-        [[nodiscard]] SGJK_SIZE_TYPE get_iteration_count() const noexcept {
-            return iteration_ + 1;
-        }
-        [[nodiscard]] const math_vector3d* get_simplex_data() const noexcept {
-            return simplex_;
-        }
-    };
-    typedef collision_detecter_3dt<SGJK_DEFAULT_VEC3D> collision_detecter_3d;
 };
 
 #endif // ifndef SGJK_HEAD_HPP_
