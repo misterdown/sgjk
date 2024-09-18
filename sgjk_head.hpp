@@ -1,6 +1,8 @@
 #ifndef SGJK_HEAD_HPP_
 #define SGJK_HEAD_HPP_ 1
 
+#include <iostream>
+
 #if (!(defined SGJK_ASSERT))
 #   include <cassert>
 #   define SGJK_ASSERT(expr__) assert(expr__)
@@ -382,6 +384,39 @@ namespace sgjk  {
         typedef const T__ type;
     };
 
+    template<class T1__, class T2__>
+    struct simple_pair {
+        public:
+        T1__ first;
+        T2__ second;
+
+        public:
+        simple_pair(const T1__& f, const T2__& s) : first(f), second(s) {
+
+        }
+        simple_pair(T1__&& f, T2__&& s) : first(SGJK_MOVE(f)), second(SGJK_MOVE(s)) {
+
+        }
+    };
+    
+    template<class T__>
+    struct single_t_pair {
+        public:
+        typedef T__ value_type;
+
+        public:
+        value_type first;
+        value_type second;
+
+        single_t_pair(const value_type& f, const value_type& s) : first(f), second(s) {
+
+        }
+        single_t_pair(value_type&& f, value_type&& s) : first(SGJK_MOVE(f)), second(SGJK_MOVE(s)) {
+
+        }
+    };
+    
+
     /**
      * @brief a wrapper for any collider type.
      *
@@ -502,7 +537,7 @@ namespace sgjk  {
      * @brief a polygon collider for any dimension.
      *
      * @tparam MathVectorAnyDT_ the type of the math vector to use. The vector must implement math operators, 'dot', 'cross', and 'normalized'.
-     * @tparam ContainerT_ the type of the container to use for storing vertices. The container type must implement '[]' operator, 'empty', 'size', work with iterators.
+     * @tparam ContainerT_ the type of the container to use for storing simplex_. The container type must implement '[]' operator, 'empty', 'size', work with iterators.
      */
     template<class MathVectorAnyDT_, class ContainerT_ = SGJK_DEFAULT_CONTAINER<MathVectorAnyDT_>>
     struct polygon_collider_anydt final {
@@ -673,12 +708,10 @@ namespace sgjk  {
 
             math_vector2d direction = first.get_some_point() - second.get_some_point();
             if (direction == math_vector2d(0, 0)) { // if colliders intersect, then simplex must be valid. Fill simplex with something. 
-                simplex_[0] = support(first, second, direction);
+                simplex_[0] = support(first, second, math_vector2d(1, 0));
                 simplex_[1] = support(first, second, -simplex_[0]);
                 const math_vector2d ab = simplex_[1] - simplex_[0];
-                math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
-                if (SGJK_DOT(abPerp, -simplex_[0]) < (scalar_type)0)
-                    abPerp = -abPerp;
+                const math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
                 simplex_[2] = support(first, second, abPerp);
                 return true;
             }
@@ -818,6 +851,302 @@ namespace sgjk  {
         }
     };
     typedef collision_detecter_2dt<SGJK_DEFAULT_VEC2D> collision_detecter_2d;
+    /**
+     * @brief a collision detector for 3D vectors.
+     *
+     * @tparam MathVector3DT_ the type of the math vector to use.
+     */
+    template<class MathVector3DT_>
+    struct collision_detecter_3dt final {
+        private:
+        typedef MathVector3DT_ math_vector3d;
+        typedef typename MathVector3DT_::value_type scalar_type;
+        
+        private:
+        SGJK_SIZE_TYPE iteration_;
+        math_vector3d simplex_[4u];
+
+        public:
+        /**  
+         * @brief Checks for collision between 3D colliders. Does not check the validity of the colliders before starting the algorithm. Check 'is_collide' for safety.
+         * 
+         * @tparam FirstCollider3DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @tparam SecondCollider3DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @param first first collider.
+         * @param second second collider.
+         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
+         * @return Whether a collision is present.
+         */ 
+        template<class FirstCollider3DT_, class SecondCollider3DT_>
+        [[nodiscard]] bool is_collide_unsafe(
+            const FirstCollider3DT_& first,
+            const SecondCollider3DT_& second, 
+            const SGJK_SIZE_TYPE maxIterationCount = 32) {
+
+            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
+
+            iteration_ = 0;
+
+            math_vector3d direction = first.get_some_point() - second.get_some_point();
+            if (direction == math_vector3d(0, 0, 0)) { // if colliders intersect, then simplex must be valid. Fill simplex with something. 
+                simplex_[0] = support(first, second,  math_vector3d(1, 0, 0));
+                simplex_[1] = support(first, second, -simplex_[0]);
+
+                const math_vector3d ab = simplex_[1] - simplex_[0];
+                const math_vector3d abPerp = math_vector3d(-ab.y, ab.x, ab.z);
+                simplex_[2] = support(first, second, abPerp);
+
+                const math_vector3d ac = simplex_[2] - simplex_[0];
+                simplex_[3] = support(first, second, SGJK_CROSS(ab, ac));
+                return true;
+            }
+            math_vector3d supportPoint = support(first, second, direction);
+            simplex_[0] = supportPoint;
+            SGJK_SIZE_TYPE simplexSize = 1;
+            direction = -supportPoint;
+
+            for (; iteration_ < maxIterationCount; ++iteration_) {
+                supportPoint = support(first, second, direction);
+                if (SGJK_DOT(supportPoint, direction) <= (scalar_type)0) {
+                    return false;
+                }
+                simplex_[simplexSize] = supportPoint;
+                ++simplexSize;
+                if (simplexSize == 2) {
+                    const math_vector3d ab = simplex_[1] - simplex_[0];
+                    const math_vector3d ao = -simplex_[0];
+                    if (SGJK_DOT(ab, ao) > 0) {
+                        direction = SGJK_CROSS(SGJK_CROSS(ab, ao), ab);
+                        if (direction == math_vector3d(0, 0, 0)) { // paralel vectors. Collision detect. If colliders intersect, then simplex must be valid. Fill simplex with something. 
+                            const math_vector3d abPerp = math_vector3d(-ab.y, ab.x, ab.z);
+                            simplex_[2] = support(first, second, abPerp);
+                            const math_vector3d ac = simplex_[2] - simplex_[0];
+                            simplex_[3] = support(first, second, SGJK_CROSS(ab, ac));
+                            return true;
+                        }
+                    } else {
+                        simplex_[0] = simplex_[1];
+                        direction = -simplex_[1];
+                        simplexSize = 1;
+                    }
+                    
+                } else if (simplexSize == 3) {
+                    const math_vector3d ao = -simplex_[0];
+                    const math_vector3d ac = simplex_[2] - simplex_[0];
+                    const math_vector3d ab = simplex_[1] - simplex_[0];
+                    direction = SGJK_CROSS(ac, ab);
+
+                    if (SGJK_DOT(direction, ao) < (scalar_type)0) 
+                        direction = -direction;
+                } else if (simplexSize == 4) {
+                    const math_vector3d da = simplex_[3] - simplex_[0];
+                    const math_vector3d db = simplex_[3] - simplex_[1];
+                    const math_vector3d dc = simplex_[3] - simplex_[2];
+                    const math_vector3d d0 = -simplex_[3];
+
+                    const math_vector3d abdPerp = SGJK_CROSS(da, db);
+                    const math_vector3d bcdPerp = SGJK_CROSS(db, dc);
+                    const math_vector3d cadPerp = SGJK_CROSS(dc, da);
+
+                    if (SGJK_DOT(abdPerp, d0) > (scalar_type)0) {
+                        simplex_[2] = simplex_[3];
+                        simplexSize = 3; // Old siplex [A, B, C, D] - new [A, B, D]
+                        direction = abdPerp;
+                    } else if (SGJK_DOT(bcdPerp, d0) > (scalar_type)0) {
+                        simplex_[0] = simplex_[1];
+                        simplex_[1] = simplex_[2];
+                        simplex_[2] = simplex_[3];
+                        simplexSize = 3; // Old siplex [A, B, C, D] - new [B, C, D]
+                        direction = bcdPerp;
+                    } else if (SGJK_DOT(cadPerp, d0) > (scalar_type)0) {
+                        simplex_[1] = simplex_[2];
+                        simplex_[2] = simplex_[3];
+                        simplexSize = 3; // Old siplex [A, B, C, D] - new [A, C, D]
+                        direction = cadPerp;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    SGJK_ASSERT(false);
+                    return false;
+                }
+            }
+            return false;
+        }
+        /**  
+         * @brief Checks for collision between 3D colliders. Checks the validity of the colliders before starting the algorithm.
+         * 
+         * @tparam FirstCollider3DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @tparam SecondCollider3DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @param first first collider.
+         * @param second second collider.
+         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
+         * @return Whether a collision is present.
+         */ 
+        template<class FirstCollider3DT_, class SecondCollider3DT_>
+        [[nodiscard]] bool is_collide(
+            const FirstCollider3DT_& first,
+            const SecondCollider3DT_& second, 
+            const SGJK_SIZE_TYPE maxIterationCount = 32) {
+
+            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
+            
+            if (!(first.is_valid() && second.is_valid())) {
+                iteration_ = 0;
+                return false;
+            }
+
+            return is_collide_unsafe(first, second, maxIterationCount);
+        }
+        
+        template<class FirstCollider3DT_, class SecondCollider3DT_>
+        [[nodiscard]] math_vector3d get_penetration_vector_unsafe(
+            const FirstCollider3DT_& first,
+            const SecondCollider3DT_& second, 
+            const scalar_type toleranceDistance = 0.001,
+            const SGJK_SIZE_TYPE maxIterationCount = 32) {
+
+            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
+
+            const auto addEndgeIfUnique = [](SGJK_DEFAULT_CONTAINER<single_t_pair<SGJK_SIZE_TYPE>>& edges, SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE>& faces, SGJK_SIZE_TYPE i, SGJK_SIZE_TYPE j) {
+                const auto simpleFind = [](const SGJK_DEFAULT_CONTAINER<single_t_pair<SGJK_SIZE_TYPE>>& edges, SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE>& faces, SGJK_SIZE_TYPE i, SGJK_SIZE_TYPE j) {
+                    auto it = edges.begin();
+                    for (;it != edges.end(); ++it) {
+                        const auto& val = *it;
+                        if ((val.first == faces[j]) && (val.second == faces[i]))
+                            return it;
+                    }
+                    return it;
+                };
+                auto reverse = simpleFind(edges, faces, i, j);
+
+                if (reverse != edges.end())
+                    edges.erase(reverse);
+                else
+                    edges.push_back(single_t_pair<SGJK_SIZE_TYPE>(faces[i], faces[j]));
+            };
+
+            /// @return simple_pair<SGJK_DEFAULT_CONTAINER<simple_pair<math_vector3d, scalar_type>>, SGJK_SIZE_TYPE> 
+            const auto getFaceNormals = [](const SGJK_DEFAULT_CONTAINER<math_vector3d>& polytope, const SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE>& faces) {
+                SGJK_DEFAULT_CONTAINER<simple_pair<math_vector3d, scalar_type>> normals;
+                SGJK_SIZE_TYPE minTriangle = 0;
+                scalar_type minDistance = SGJK_MAX_VALUE_OF(scalar_type);
+
+                for (SGJK_SIZE_TYPE i = 0; i < faces.size(); i += 3) {
+                    const math_vector3d& a = polytope[faces[i]];
+                    const math_vector3d& b = polytope[faces[i + 1]];
+                    const math_vector3d& c = polytope[faces[i + 2]];
+
+                    math_vector3d normal = SGJK_NORMALIZED(SGJK_CROSS((b - a), (c - a)));
+                    float distance = SGJK_DOT(normal, a);
+
+                    if (distance < (scalar_type)0) {
+                        normal = -normal;
+                        distance = -distance;
+                    }
+
+                    normals.push_back(simple_pair<math_vector3d, scalar_type>{normal, distance});
+            
+                    if (distance < minDistance) {
+                        minTriangle = i / 3;
+                        minDistance = distance;
+                    }
+                }
+                return simple_pair<SGJK_DEFAULT_CONTAINER<simple_pair<math_vector3d, scalar_type>>, SGJK_SIZE_TYPE>(normals, minTriangle);
+            };
+
+            iteration_ = 0;
+
+            SGJK_DEFAULT_CONTAINER<math_vector3d> polytope(simplex_, simplex_ + 4);
+            SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE> faces{
+                0, 1, 2,
+                0, 3, 1,
+                0, 2, 3,
+                1, 3, 2
+            };
+
+            scalar_type minDistance = SGJK_MAX_VALUE_OF(scalar_type);
+            math_vector3d minNormal;
+
+            auto defaultNormalsData = getFaceNormals(polytope, faces);
+            auto& normals = defaultNormalsData.first;
+            auto minFace = defaultNormalsData.second;
+
+            for (; (iteration_ < maxIterationCount) && (minDistance == SGJK_MAX_VALUE_OF(scalar_type)); ++iteration_) {
+                minNormal = normals[minFace].first;
+                minDistance = normals[minFace].second;
+
+                const math_vector3d supportPoint = support(first, second, minNormal);
+                const scalar_type sDistance = SGJK_DOT(minNormal, supportPoint);
+
+                if (::std::abs(sDistance - minDistance) > toleranceDistance) {
+                    minDistance = SGJK_MAX_VALUE_OF(scalar_type);
+                    SGJK_DEFAULT_CONTAINER<single_t_pair<SGJK_SIZE_TYPE>> uniqueEdges;
+
+                    for (SGJK_SIZE_TYPE i = 0; i < normals.size(); ++i) {
+                        if (SGJK_DOT(normals[i].first, supportPoint) > (scalar_type)0) {
+                            SGJK_SIZE_TYPE f = i * 3;
+
+                            addEndgeIfUnique(uniqueEdges, faces, f, f + 1);
+                            addEndgeIfUnique(uniqueEdges, faces, f + 1, f + 2);
+                            addEndgeIfUnique(uniqueEdges, faces, f + 2, f);
+
+                            faces[f + 2] = faces.back(); faces.pop_back();
+                            faces[f + 1] = faces.back(); faces.pop_back();
+                            faces[f] = faces.back(); faces.pop_back();
+
+                            normals[i] = normals.back(); normals.pop_back();
+
+                            --i;
+                        }
+                    }
+                    SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE> newFaces;
+                    for (auto i : uniqueEdges) {
+                        SGJK_SIZE_TYPE edgeIndex1 = i.first;
+                        SGJK_SIZE_TYPE edgeIndex2 = i.second;
+                        newFaces.push_back(edgeIndex1);
+                        newFaces.push_back(edgeIndex2);
+                        newFaces.push_back(polytope.size());
+                    }
+
+                    polytope.push_back(supportPoint);
+
+                    auto normalData = getFaceNormals(polytope, newFaces);
+                    auto& newNormals = normalData.first;
+                    auto newMinFace = normalData.second;
+                    scalar_type oldMinDistance = SGJK_MAX_VALUE_OF(scalar_type);
+                    for (SGJK_SIZE_TYPE i = 0; i < normals.size(); i++) {
+                        if (normals[i].second < oldMinDistance) {
+                            oldMinDistance = normals[i].second;
+                            minFace = i;
+                        }
+                    }
+
+                    if (newNormals[newMinFace].second < oldMinDistance) {
+                        minFace = newMinFace + normals.size();
+                    }
+
+                    faces.insert(faces.end(), newFaces.begin(), newFaces.end());
+                    normals.insert(normals.end(), newNormals.begin(), newNormals.end());
+                }
+            }
+            if (minDistance == SGJK_MAX_VALUE_OF(scalar_type))
+                minDistance = normals[minFace].second;
+
+            return minNormal * (minDistance + toleranceDistance);
+        }
+
+        [[nodiscard]] SGJK_SIZE_TYPE get_iteration_count() const noexcept {
+            return iteration_ + 1;
+        }
+        [[nodiscard]] const math_vector3d* get_simplex_data() const noexcept {
+            return simplex_;
+        }
+    };
+    typedef collision_detecter_3dt<SGJK_DEFAULT_VEC3D> collision_detecter_3d;
 };
 
 #endif // ifndef SGJK_HEAD_HPP_
