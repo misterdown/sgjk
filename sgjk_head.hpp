@@ -28,6 +28,11 @@
 #   define SGJK_MAX_VALUE_OF(T__) (::std::numeric_limits<T__>::max())
 #endif // !defined SGJK_MAX_VALUE_OF
 
+#if (!(defined SGJK_ABS))
+#   include <cmath>
+#   define SGJK_ABS(val__) (::std::abs(val__))
+#endif // !defined SGJK_MAX_VALUE_OF
+
 #if (!(defined SGKJ_NOT_IMPLEMENT_VECTORS)) /////////////////////////////////////////////////////////////
 #if (!(defined SGJK_DEFAULT_VEC2D))
 #      define SGJK_DEFAULT_VEC2D ::sgjk::linear::vec2
@@ -833,7 +838,7 @@ namespace sgjk  {
                 const math_vector2d supportPoint = support(first, second, minNormal);
                 const scalar_type sDistance = SGJK_DOT(minNormal, supportPoint);
 
-                if (::std::abs(sDistance - minDistance) > toleranceDistance) {
+                if (SGJK_ABS(sDistance - minDistance) > toleranceDistance) {
                     minDistance = SGJK_MAX_VALUE_OF(scalar_type);
                     polytope.insert(polytope.begin() + minIndex, {supportPoint});
                 }
@@ -1000,7 +1005,7 @@ namespace sgjk  {
 
             return is_collide_unsafe(first, second, maxIterationCount);
         }
-        
+
         template<class FirstCollider3DT_, class SecondCollider3DT_>
         [[nodiscard]] math_vector3d get_penetration_vector_unsafe(
             const FirstCollider3DT_& first,
@@ -1082,7 +1087,7 @@ namespace sgjk  {
                 const math_vector3d supportPoint = support(first, second, minNormal);
                 const scalar_type sDistance = SGJK_DOT(minNormal, supportPoint);
 
-                if (::std::abs(sDistance - minDistance) > toleranceDistance) {
+                if (SGJK_ABS(sDistance - minDistance) > toleranceDistance) {
                     minDistance = SGJK_MAX_VALUE_OF(scalar_type);
                     SGJK_DEFAULT_CONTAINER<single_t_pair<SGJK_SIZE_TYPE>> uniqueEdges;
 
