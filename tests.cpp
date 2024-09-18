@@ -40,7 +40,7 @@ struct line_anyd final {
 typedef line_anyd<sgjk::linear::vec2> line_2d;
 typedef line_anyd<sgjk::linear::vec3> line_3d;
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool basic_collision_test() {
     std::cout << "basic collision test\n";
 
@@ -77,7 +77,7 @@ bool basic_collision_test() {
     return false;
 }
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool basic_second_collision_test() {
     std::cout << "second basic collision test\n";
 
@@ -105,7 +105,7 @@ bool basic_second_collision_test() {
     return false;
 }
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool basic_thrird_collision_test() {
     std::cout << "third basic collision test\n";
 
@@ -144,7 +144,7 @@ bool basic_thrird_collision_test() {
     }
 }
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool epa_test() {
     std::cout << "epa test\n";
 
@@ -187,8 +187,6 @@ bool epa_test() {
 
             return true;
         }
-        p = collisionDetector.get_penetration_vector_unsafe(collider1, collider2, 0);
-        std::cout << "second penetration vector: " <<  p.x << ' ' << p.y << " " << collisionDetector.get_iteration_count() << "\n\n";
         return false;
 
     } else {
@@ -198,7 +196,7 @@ bool epa_test() {
     return false;
 }
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool custom_type_collision_test() {
     std::cout << "custom type\n";
 
@@ -221,7 +219,7 @@ bool custom_type_collision_test() {
     return false;
 }
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool wrappers_collision_test() {
     std::cout << "wrappers test\n";
 
@@ -247,7 +245,7 @@ bool wrappers_collision_test() {
     return false;
 }
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool edge_collision_test() {
     std::cout << "edge collision test\n";
 
@@ -284,7 +282,7 @@ bool edge_collision_test() {
     return false;
 }
 
-// success or not
+// success or not. true - ecxpected result. false - something wrong
 bool int_collision_test() {
     using ivec2 = sgjk::linear::vec2T<int>;
     std::cout << "int collision test\n";
@@ -322,6 +320,163 @@ bool int_collision_test() {
     return false;
 }
 
+// success or not. true - ecxpected result. false - something wrong
+bool basic3d_collision_test() {
+    std::cout << "basic 3d collision test\n";
+
+    sgjk::polygon_collider_3d collider1(sgjk::polygon_collider_3d({
+        sgjk::linear::vec3(-1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 0.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 0.0f),
+        sgjk::linear::vec3(-1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 1.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 1.0f),
+    }));
+    sgjk::polygon_collider_3d collider2(sgjk::polygon_collider_3d({
+        sgjk::linear::vec3(-1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 0.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 0.0f),
+        sgjk::linear::vec3(-1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 1.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 1.0f),
+    }));
+    for (auto& i : collider2.get_vertices()) {
+        i.x += 0.03f;
+        i.y += 0.04f;
+        i.z -= 0.3f;
+    }
+
+    sgjk::collision_detecter_3d collisionDetector;
+    if (collisionDetector.is_collide(collider1, collider2)) {
+        const auto simplex = collisionDetector.get_simplex_data();
+        std::cout << "shapes intersect on " << collisionDetector.get_iteration_count() << " iteration. Simplex: { (" 
+        << simplex[0].x << ", " << simplex[0].y << ", " << simplex[0].z <<"), ("
+        << simplex[1].x << ", " << simplex[1].y << ", " << simplex[1].z << "), ("
+        << simplex[2].x << ", " << simplex[2].y << ", " << simplex[2].z << ") ("
+        << simplex[3].x << ", " << simplex[3].y << ", " << simplex[3].z << ") "
+        << "}\n\n";
+        return true;
+    } else {
+        std::cout << "shapes do not intersect on " << collisionDetector.get_iteration_count() << " iteration\n\n";
+        return false;
+    }
+    return false;
+}
+// success or not. true - ecxpected result. false - something wrong
+bool epa3d_test() {
+    std::cout << "epa 3d test\n";
+
+    sgjk::polygon_collider_3d collider1(sgjk::polygon_collider_3d({
+        sgjk::linear::vec3(-1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 0.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 0.0f),
+        sgjk::linear::vec3(-1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 1.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 1.0f),
+    }));
+    sgjk::polygon_collider_3d collider2(sgjk::polygon_collider_3d({
+        sgjk::linear::vec3(-1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 0.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 0.0f),
+        sgjk::linear::vec3(-1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 1.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 1.0f),
+    }));
+    for (auto& i : collider2.get_vertices()) {
+        i.x += 1.0f;
+        i.y += 0.5f;
+        i.z += 0.25f;
+    }
+
+    sgjk::collision_detecter_3d collisionDetector;
+    if (collisionDetector.is_collide(collider1, collider2)) {
+        const auto simplex = collisionDetector.get_simplex_data();
+        std::cout << "shapes intersect on " << collisionDetector.get_iteration_count() << " iteration. Simplex: { (" 
+        << simplex[0].x << ", " << simplex[0].y << ", " << simplex[0].z <<"), ("
+        << simplex[1].x << ", " << simplex[1].y << ", " << simplex[1].z << "), ("
+        << simplex[2].x << ", " << simplex[2].y << ", " << simplex[2].z << ") ("
+        << simplex[3].x << ", " << simplex[3].y << ", " << simplex[3].z << ") "
+        << "}\n";
+
+        sgjk::linear::vec3 p = collisionDetector.get_penetration_vector_unsafe(collider1, collider2);
+        ::std::cout << "penetration vector: " << p.x << ", " << p.y << ", " << p.z << '\n';
+        for (auto& i : collider1.get_vertices()) {
+            i -= p;
+        }
+        if (!collisionDetector.is_collide(collider1, collider2)) {
+            std::cout << "shapes not intersect on " << collisionDetector.get_iteration_count() << " iteration. Simplex: { (" 
+            << simplex[0].x << ", " << simplex[0].y << ", " << simplex[0].z << "), ("
+            << simplex[1].x << ", " << simplex[1].y << ", " << simplex[1].z << "), ("
+            << simplex[2].x << ", " << simplex[2].y << ", " << simplex[2].z << "), ("
+            << simplex[3].x << ", " << simplex[3].y << ", " << simplex[3].z << ") "
+            << "}\n\n";
+
+            return true;
+        }
+        return false;
+    } else {
+        std::cout << "shapes do not intersect on " << collisionDetector.get_iteration_count() << " iteration\n\n";
+        return false;
+    }
+    return false;
+}
+
+// success or not. true - ecxpected result. false - something wrong
+bool edge_collision3d_test() {
+    std::cout << "edge collision 3d test\n";
+
+    sgjk::polygon_collider_3d collider1(sgjk::polygon_collider_3d({
+        sgjk::linear::vec3(-1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 0.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 0.0f),
+        sgjk::linear::vec3(-1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 1.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 1.0f),
+    }));
+    sgjk::polygon_collider_3d collider2(sgjk::polygon_collider_3d({
+        sgjk::linear::vec3(-1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 0.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 0.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 0.0f),
+        sgjk::linear::vec3(-1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(0.0f, -1.0f, 1.0f),
+        sgjk::linear::vec3(1.0f, 1.0, 1.0f),
+        sgjk::linear::vec3(1.0f, -1.0, 1.0f),
+    }));
+    for (auto& i : collider2.get_vertices()) {
+        i.x += 2.0f;
+        i.y += 0.0f;
+        i.z += 0.0f;
+    }
+
+    sgjk::collision_detecter_3d collisionDetector;
+    if (collisionDetector.is_collide(collider1, collider2)) {
+        const auto simplex = collisionDetector.get_simplex_data();
+        std::cout << "shapes intersect on " << collisionDetector.get_iteration_count() << " iteration. Simplex: { (" 
+        << simplex[0].x << ", " << simplex[0].y << ", " << simplex[0].z <<"), ("
+        << simplex[1].x << ", " << simplex[1].y << ", " << simplex[1].z << "), ("
+        << simplex[2].x << ", " << simplex[2].y << ", " << simplex[2].z << ") ("
+        << simplex[3].x << ", " << simplex[3].y << ", " << simplex[3].z << ") "
+        << "}\n\n";
+        return true;
+    } else {
+        std::cout << "shapes do not intersect on " << collisionDetector.get_iteration_count() << " iteration\n\n";
+        return false;
+    }
+    return false;
+}
+
+
 template<class FirstColliderT_, class SecondColliderT_>
 [[nodiscard]] ::std::vector<sgjk::linear::vec2> build_needed_minkovsky_differens(const FirstColliderT_& first, const SecondColliderT_& second, float eps = 0.01) {
     ::std::vector<sgjk::linear::vec2> points;
@@ -350,20 +505,23 @@ int main() {
     successCount += epa_test();
     successCount += custom_type_collision_test();
     successCount += wrappers_collision_test();
+    successCount += basic3d_collision_test();
+    successCount += epa3d_test();
     
-    bool edgeCollisionResult = edge_collision_test();
+    bool edgeCollision2DResult = edge_collision_test();
+    bool edgeCollision3DResult = edge_collision3d_test();
     bool intCollisionResult = int_collision_test();
 
-    ::std::cout << successCount << "/6\n";
+    ::std::cout << successCount << "/8\nexperements:\n";
 
-    if (edgeCollisionResult)
-        ::std::cout << "edge collision test: true\n";
-    else
-        ::std::cout << "edge collision test: false\n";
+    if (edgeCollision2DResult)  ::std::cout << "edge collision 2d test: true\n";
+    else                        ::std::cout << "edge collision 2d test: false\n";
 
-    if (intCollisionResult)
-        ::std::cout << "int collision test: true\n";
-    else
-        ::std::cout << "int collision test: false\n";
+    if (intCollisionResult) ::std::cout << "int collision test: true\n";
+    else                    ::std::cout << "int collision test: false\n";
+
+    if (edgeCollision3DResult)  ::std::cout << "edge collision 3d test: true\n";
+    else                        ::std::cout << "edge collision 3d test: false\n";
+
     return 0;
 }
