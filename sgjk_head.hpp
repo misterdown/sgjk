@@ -747,19 +747,22 @@ namespace sgjk  {
                     const math_vector2d ca = simplex_[0] - simplex_[2];
                     const math_vector2d co = -simplex_[2];
 
+
                     if ((SGJK_CROSS(ab, ao) >= (scalar_type)0 && SGJK_CROSS(bc, bo) >= (scalar_type)0 && SGJK_CROSS(ca, co) >= (scalar_type)0) ||
                         (SGJK_CROSS(ab, ao) <= (scalar_type)0 && SGJK_CROSS(bc, bo) <= (scalar_type)0 && SGJK_CROSS(ca, co) <= (scalar_type)0)) {
                         return true;
                     } else {
-                        //simplex_[0] = simplex_[2];
-                        //simplexSize = 2;
-                        //const math_vector2d ao = -simplex_[0];
-                        //const math_vector2d ab = simplex_[1] - simplex_[0];
-                        //math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
-                        //if (SGJK_DOT(abPerp, ao) < (scalar_type)0)
-                        //    abPerp = -abPerp;
-                        //direction = abPerp;
-                        return false;
+                        simplex_[1] = simplex_[0];
+                        simplex_[0] = simplex_[2];
+                        //simplexSize = 1;
+                        //direction = simplex_[0];
+                        simplexSize = 2;
+                        const math_vector2d aon = -simplex_[0];
+                        const math_vector2d abn = simplex_[1] - simplex_[0];
+                        math_vector2d abnPerp = math_vector2d(-abn.y, abn.x);
+                        if (SGJK_DOT(abnPerp, aon) < (scalar_type)0)
+                            abnPerp = -abnPerp;
+                        direction = abnPerp;
                     }
                 } else {
                     SGJK_ASSERT(false);
