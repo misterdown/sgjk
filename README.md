@@ -1,20 +1,31 @@
-# SGJK: Simple GJK Collision Detection Library
+# sgjk - Simple GJK
 
-SGJK is a single .hpp file C++11 library for collision detection using the Gilbert-Johnson-Keerthi (GJK) algorithm. This library provides a flexible and efficient way to detect collisions between convex shapes in both 2D and 3D spaces.
+## Overview
+
+sgjk is a simple implementation of the Gilbert–Johnson–Keerthi (GJK) algorithm. It supports C++11 and higher versions.
 
 - [Features](#features)
+- [Personal Experience](#personal-experience)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Examples](#examples)
 - [License](#license)
 
+
 ## Features
 
-- Supports 2D and 3D collision detection.
-- Uses the GJK algorithm for efficient collision detection.
-- Provides a flexible and extensible framework for defining custom colliders.
-- Supports various mathematical operations on vectors.
-- Includes predefined colliders for polygons and circles.
+- **No STD Dependencies(optional)**: sgjk can work without any standard library dependencies if you choose to redefine specific macros.
+- **Custom Classes**: It supports user-defined vector, collider, and transform classes that meet modest requirements.
+- **Collision Detection and Resolution**: sgjk can detect and resolve collisions in both 2D and 3D spaces.
+
+## Personal Experience
+
+The term "simple" is an **ABSOLUTE LIE**. This "simple" implementation has destroyed me from within. I tried to provide all possible ways to customize classes but forgot that in C++, you can customize **EVERYTHING**. Freedom of choice is the enemy of any programmer.
+
+### Lessons Learned
+
+While working on this project, I learned to suffer and do it with a smile. In reality, I learned a lot.
+
 ## Installation
 
 To use SGJK in your project, simply include the `sgjk_head.hpp` header file in your source code. Additionally, you can customize various aspects of the library by defining specific macros before including the header.
@@ -45,43 +56,9 @@ SGJK uses `std::vector` as the default container. You can override this by defin
 #define SGJK_DEFAULT_CONTAINER your_custom_container
 ```
 
-#### Move Semantics
+#### ETC
 
-SGJK uses `std::move` for move semantics. You can override this by defining the `SGJK_MOVE` macro before including the header.
-
-```cpp
-#define SGJK_MOVE(obj__) your_custom_move(obj__)
-```
-
-#### Size Type
-
-SGJK uses `size_t` as the default size type. You can override this by defining the `SGJK_SIZE_TYPE` macro before including the header.
-
-```cpp
-#define SGJK_SIZE_TYPE your_custom_size_type
-```
-
-#### Vector Types
-
-SGJK provides default vector types for 2D and 3D vectors. You can override these by defining the `SGJK_DEFAULT_VEC2D` and `SGJK_DEFAULT_VEC3D` macros before including the header.
-
-```cpp
-#define SGJK_DEFAULT_VEC2D your_custom_vec2d
-#define SGJK_DEFAULT_VEC3D your_custom_vec3d
-```
-
-#### Mathematical Operations
-
-SGJK provides default implementations for mathematical operations such as `dot`, `length`, `normalized`, and `cross`. You can override these by defining the `SGJK_DOT`, `SGJK_LENGTH`, `SGJK_NORMALIZED`, and `SGJK_CROSS` macros before including the header.
-
-```cpp
-#define SGJK_DOT(first__, second__) your_custom_dot(first__, second__)
-#define SGJK_LENGTH(vec__) your_custom_length(vec__)
-#define SGJK_NORMALIZED(vec__) your_custom_normalized(vec__)
-#define SGJK_CROSS(first__, second__) your_custom_cross(first__, second__)
-```
-
-By customizing these macros, you can avoid dependencies and tailor the SGJK library to your specific needs.
+just define a macros.
 
 ## Usage
 
@@ -100,6 +77,12 @@ float dotProduct = sgjk::linear::dot(v1, v2);
 ### Colliders
 
 SGJK provides predefined colliders for polygons, circles and wapper for any collider type. You can also define your own custom colliders by implementing the required methods.
+
+####  Interface Requirements
+Collider classes must implement an interface with the following methods:
+
+- **get_some_point**: This method should return any point on the surface of the collider, taking into account any applied transformations.
+- **get_furthest_point**: This method should find and return the furthest point in a given direction, taking into account any applied transformations.
 
 #### Polygon Collider
 
@@ -128,8 +111,7 @@ sgjk::circle_collider_2d circleCollider(center, radius);
 std::vector<sgjk::linear::vec2> vertices = {
     sgjk::linear::vec2(0.0f, 0.0f),
     sgjk::linear::vec2(1.0f, 0.0f),
-    sgjk::linear::vec2(1.0f, 1.0f),
-    sgjk::linear::vec2(0.0f, 1.0f)
+    sgjk::linear::vec2(1.0f, 1.0f)
 };
 sgjk::polygon_collider_2d polygonCollider(vertices);
 
@@ -137,9 +119,33 @@ sgjk::linear::vec2 center(0.0f, 0.0f);
 float radius = 1.0f;
 sgjk::circle_collider_2d circleCollider(center, radius);
 
-sgjk::collider_wrapper_2d wrapper(circleCollider);
+sgjk::collider_wrapper_2d wrapper;
+wrapper = circleCollider;
 wrapper = polygonCollider;
 ```
+
+### Transforms
+sgjk provides a flexible transform system that allows you to define and use custom transformations for your vectors. The transform system includes support for both 2D and 3D transformations, as well as a generic wrapper for any type of transformation.
+
+#### Interface Requirements
+Transform classes must implement an interface with the following methods:
+- **transformed**: method that takes a vector of the corresponding type as input and returns a transformed vector. This method should apply the transformation to the input vector and return the result.
+
+#### Transform Wrapper
+
+The `transform_wrapper_anydt` template class allows you to wrap any transformation class that meets certain requirements. This wrapper provides a unified interface for applying transformations to vectors.
+
+#### Empty Transform
+
+The `empty_transform` template class provides a default transformation that does not modify the input vector.
+
+#### 2D Transform
+
+The `transform_2dt` template class provides a 2D transformation that includes translation and rotation.
+
+#### 3D Transform
+
+The `transform_3dt` template class provides a 3D transformation that includes translation and rotation around multiple axes.
 
 ### Collision Detection
 
@@ -220,31 +226,6 @@ int main() {
         std::cout << "Shapes do not intersect\n";
     }
 
-    return 0;
-}
-```
-
-### 2D Collision Detection With Wappers
-```cpp
-int main() {
-    const std::vector<sgjk::vec2> vertices{
-        sgjk::linear::vec2(0.1f),
-        sgjk::linear::vec2(0.1f, -0.1f),
-        sgjk::linear::vec2(-0.1f, 0.1f),
-        sgjk::linear::vec2(-0.1f),
-    };
-    sgjk::linear::vec2 center(0.0f);
-    float radius = 1.0f;
-
-    sgjk::collider_wrapper_2d collider1 = sgjk::circle_collider_2d(center, radius);
-    sgjk::collider_wrapper_2d collider2 = sgjk::polygon_collider_2d(vertices);
-
-    if (collisionDetector.is_collide(collider1, collider2)) {
-        std::cout << "Shapes intersect\n";
-    } else {
-        std::cout << "Shapes do not intersect\n";
-    }
-    
     return 0;
 }
 ```
