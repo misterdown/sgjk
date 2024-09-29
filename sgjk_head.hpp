@@ -108,9 +108,8 @@
 namespace sgjk  {
     namespace linear {
         /**
-         * @brief a 2D vector class template.
-         * 
-         * @tparam ScalarType the type of the scalar components.
+         * @brief A template struct representing a 2D vector with scalar type `ScalarType`.
+         * @tparam ScalarType The type of the scalar elements in the vector.
          */
         template<class ScalarType>
         struct vec2T {
@@ -126,45 +125,84 @@ namespace sgjk  {
             };
 
             public:
+            /// @brief Default constructor initializing the vector to (0, 0).
             vec2T() : x((ScalarType)0), y((ScalarType)0) {
 
             }
+            /**
+             * @brief Constructor initializing the vector with the same scalar value for both components.
+             * @param scalar The scalar value to initialize both components.
+             */
             vec2T(const value_type& scalar) noexcept : x(scalar), y(scalar) {
 
             }
+            /**
+             * @brief Constructor initializing the vector with specific values for x and y components.
+             * @param x_ The value for the x component.
+             * @param y_ The value for the y component.
+             */
             vec2T(const value_type& x_, const value_type& y_) noexcept : x(x_), y(y_) {
 
             }
 
             public:
+            /**
+             * @brief Access operator for the vector components.
+             * @param i The index of the component to access.
+             * @return A reference to the component at the specified index.
+             */
             [[nodiscard]] value_type& operator[](SGJK_SIZE_TYPE i) {
                 return data_[i];
             }
+            /**
+             * @brief Const access operator for the vector components.
+             * @param i The index of the component to access.
+             * @return A const reference to the component at the specified index.
+             */
             [[nodiscard]] const value_type& operator[](SGJK_SIZE_TYPE i) const {
                 return data_[i];
             }
 
             public:
+             /**
+             * @brief Returns the size of the vector.
+             * @return The size of the vector (always 2).
+             */
             [[nodiscard]] constexpr SGJK_SIZE_TYPE size() const noexcept {
                 return 2;
             }
+            /**
+             * @brief Returns a pointer to the data array of the vector.
+             * @return A pointer to the data array.
+             */
             [[nodiscard]] value_type* data() noexcept {
                 return data_;
             }
+            /**
+             * @brief Returns a const pointer to the data array of the vector.
+             * @return A const pointer to the data array.
+             */
             [[nodiscard]] const value_type* data() const noexcept {
                 return data_;
             }
  
         };
         /**
-         * @brief Calculates the dot product of two vectors. @tparam ScalarType the type of the scalar components. @param first the first vector.  @param second the second vector. @return The dot product of the two vectors.
+         * @brief Computes the dot product of two 2D vectors.
+         * @tparam ScalarType The type of the scalar elements in the vectors.
+         * @param first The first vector.
+         * @param second The second vector.
+         * @return The dot product of the two vectors.
          */
         template<class ScalarType>
         [[nodiscard]] ScalarType dot(const vec2T<ScalarType>& first, const vec2T<ScalarType>& second) noexcept {
             return (first.x * second.x) + (first.y * second.y);
         }
         /**
-         * @brief Calculates the length of a vector. @tparam ScalarType the type of the scalar components. @param vec the vector. @return The length of the vector.
+         * @brief Computes the length (magnitude) of a 2D vector.
+         * @tparam ScalarType The type of the scalar elements in the vector.
+         * @param vec The vector.
+         * @return The length of the vector.
          */
         template<class ScalarType>
         [[nodiscard]] ScalarType length(const vec2T<ScalarType>& vec) noexcept {
@@ -174,7 +212,9 @@ namespace sgjk  {
             // no differens on O0
         }
         /**
-         * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector.
+         * @brief Normalizes a 2D vector in place. If length of vec equals zero do nothing.
+         * @tparam ScalarType The type of the scalar elements in the vector.
+         * @param vec The vector to normalize.
          */
         template<class ScalarType>
         void normalize(vec2T<ScalarType>& vec) noexcept {
@@ -185,7 +225,10 @@ namespace sgjk  {
             vec.y /= len;
         }
         /**
-         * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector. @return The normalized vector.
+         * @brief Returns a normalized copy of a 2D vector. If length of vec equals zero return zero vector.
+         * @tparam ScalarType The type of the scalar elements in the vector.
+         * @param vec The vector to normalize.
+         * @return A normalized copy of the vector.
          */
         template<class ScalarType>
         [[nodiscard]] vec2T<ScalarType> normalized(const vec2T<ScalarType>& vec) noexcept {
@@ -195,7 +238,11 @@ namespace sgjk  {
             return vec / len;
         }
         /**
-         * @brief Calculates the cross product of two vectors. @tparam ScalarType the type of the scalar components. @param a the first vector. @param b the second vector. @return The cross product of the two vectors.
+         * @brief Computes the cross product of two 2D vectors.
+         * @tparam ScalarType The type of the scalar elements in the vectors.
+         * @param a The first vector.
+         * @param b The second vector.
+         * @return The cross product of the two vectors.
          */
         template<class ScalarType>
         [[nodiscard]] ScalarType cross(const vec2T<ScalarType>& a, const vec2T<ScalarType>& b) noexcept {
@@ -233,9 +280,8 @@ namespace sgjk  {
         typedef vec2T<float> vec2;
 
         /**
-         * @brief a 3D vector class template.
-         * 
-         * @tparam ScalarType the type of the scalar components.
+         * @brief A template struct representing a 3D vector with scalar type `ScalarType`.
+         * @tparam ScalarType The type of the scalar elements in the vector.
          */
         template<class ScalarType>
         struct vec3T {
@@ -251,52 +297,94 @@ namespace sgjk  {
             };
 
             public:
+            /// @brief Default constructor initializing the vector to (0, 0, 0).
             vec3T() : x((ScalarType)0), y((ScalarType)0), z((ScalarType)0) {
 
             }
+            /**
+             * @brief Constructor initializing the vector with the same scalar value for all components.
+             * @param scalar The scalar value to initialize all components.
+             */
             vec3T(const value_type& scalar) noexcept : x(scalar), y(scalar), z(scalar) {
 
             }
+            /**
+             * @brief Constructor initializing the vector with specific values for x, y, and z components.
+             * @param x_ The value for the x component.
+             * @param y_ The value for the y component.
+             * @param z_ The value for the z component.
+             */
             vec3T(const value_type& x_, const value_type& y_, const value_type& z_) noexcept : x(x_), y(y_), z(z_) {
 
             }
 
             public:
+            /**
+             * @brief Access operator for the vector components.
+             * @param i The index of the component to access.
+             * @return A reference to the component at the specified index.
+             */
             [[nodiscard]] value_type& operator[](SGJK_SIZE_TYPE i) {
                 return data_[i];
             }
+            /**
+             * @brief Const access operator for the vector components.
+             * @param i The index of the component to access.
+             * @return A const reference to the component at the specified index.
+             */
             [[nodiscard]] const value_type& operator[](SGJK_SIZE_TYPE i) const {
                 return data_[i];
             }
 
             public:
+            /**
+             * @brief Returns the size of the vector.
+             * @return The size of the vector (always 3).
+             */
             [[nodiscard]] constexpr SGJK_SIZE_TYPE size() const noexcept {
                 return 3;
             }
+            /**
+             * @brief Returns a pointer to the data array of the vector.
+             * @return A pointer to the data array.
+             */
             [[nodiscard]] value_type* data() noexcept {
                 return data_;
             }
+            /**
+             * @brief Returns a const pointer to the data array of the vector.
+             * @return A const pointer to the data array.
+             */
             [[nodiscard]] const value_type* data() const noexcept {
                 return data_;
             }
  
         };
         /**
-         * @brief Calculates the dot product of two vectors. @tparam ScalarType the type of the scalar components. @param first the first vector.  @param second the second vector. @return The dot product of the two vectors.
+         * @brief Computes the dot product of two 3D vectors.
+         * @tparam ScalarType The type of the scalar elements in the vectors.
+         * @param first The first vector.
+         * @param second The second vector.
+         * @return The dot product of the two vectors.
          */
         template<class ScalarType>
         [[nodiscard]] ScalarType dot(const vec3T<ScalarType>& first, const vec3T<ScalarType>& second) noexcept {
             return (first.x * second.x) + (first.y * second.y) + (first.z * second.z);
         }
         /**
-         * @brief Calculates the length of a vector. @tparam ScalarType the type of the scalar components. @param vec the vector. @return The length of the vector.
+         * @brief Computes the length (magnitude) of a 3D vector.
+         * @tparam ScalarType The type of the scalar elements in the vector.
+         * @param vec The vector.
+         * @return The length of the vector.
          */
         template<class ScalarType>
         [[nodiscard]] ScalarType length(const vec3T<ScalarType>& vec) noexcept {
             return SGJK_SQRT(dot(vec, vec));
         }
         /**
-         * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector.
+         * @brief Normalizes a 3D vector in place. If length of vec equals zero do nothing.
+         * @tparam ScalarType The type of the scalar elements in the vector.
+         * @param vec The vector to normalize.
          */
         template<class ScalarType>
         void normalize(vec3T<ScalarType>& vec) noexcept {
@@ -308,7 +396,10 @@ namespace sgjk  {
             vec.z /= len;
         }
         /**
-         * @brief Normalizes a vector. @tparam ScalarType the type of the scalar components. @param vec the vector. @return The normalized vector.
+         * @brief Returns a normalized copy of a 3D vector. If length of vec equals zero return zero vector.
+         * @tparam ScalarType The type of the scalar elements in the vector.
+         * @param vec The vector to normalize.
+         * @return A normalized copy of the vector.
          */
         template<class ScalarType>
         [[nodiscard]] vec3T<ScalarType> normalized(const vec3T<ScalarType>& vec) noexcept {
@@ -318,7 +409,11 @@ namespace sgjk  {
             return vec / len;
         }
         /**
-         * @brief Calculates the cross product of two vectors. @tparam ScalarType the type of the scalar components. @param a the first vector. @param b the second vector. @return The cross product of the two vectors.
+         * @brief Computes the cross product of two 3D vectors.
+         * @tparam ScalarType The type of the scalar elements in the vectors.
+         * @param a The first vector.
+         * @param b The second vector.
+         * @return The cross product of the two vectors.
          */
         template<class ScalarType>
         [[nodiscard]] vec3T<ScalarType> cross(const vec3T<ScalarType>& a, const vec3T<ScalarType>& b) noexcept {
@@ -468,6 +563,10 @@ namespace sgjk  {
 
         }
     };
+    /**
+     * @brief A template struct that wraps any type of transform with a specific math vector type. It provides a polymorphic interface for transforming points.
+     * @tparam MathVectorAnyDT_ The type of the math vector.
+     */
     template<class MathVectorAnyDT_>
     struct transform_wrapper_anydt {
         public:
@@ -564,10 +663,19 @@ namespace sgjk  {
         }
         
         public:
+        /**
+         * @brief Transforms a point using the wrapped transform.
+         * @param point The point to transform.
+         * @return The transformed point.
+         */
         [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
             return wrapped_->transformed(point);
         }
     };
+    /**
+     * @brief A template struct representing an empty transform for a specific math vector type.
+     * @tparam MathVectorAnyDT_ The type of the math vector.
+     */
     template<class MathVectorAnyDT_>
     struct empty_transform {
         public:
@@ -579,11 +687,19 @@ namespace sgjk  {
         }
 
         public:
+        /**
+         * @brief Transforms a point using the empty transform (returns the point unchanged).
+         * @param point The point to transform.
+         * @return The transformed point (unchanged).
+         */
         [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
             return point;
         }
     };
-
+    /**
+     * @brief A template struct representing a 2D transform for a specific math vector type.
+     * @tparam MathVector2T_ The type of the math vector.
+     */
     template<class MathVector2T_>
     struct transform_2dt {
         public:
@@ -603,6 +719,11 @@ namespace sgjk  {
         }
 
         public:
+        /**
+         * @brief Transforms a point using the rotation and position in 2D space.
+         * @param point The point to transform.
+         * @return The transformed point.
+         */
         [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
             const scalar_type cos_theta = SGJK_COS(radians_);
             const scalar_type sin_theta = SGJK_SIN(radians_);
@@ -638,6 +759,10 @@ namespace sgjk  {
     /// @brief specialization of transform_3dt for default vector2d class.
     typedef transform_2dt<SGJK_DEFAULT_VEC2D> transform2d;
 
+    /**
+     * @brief A template struct representing a 3D transform for a specific math vector type.
+     * @tparam MathVector3T_ The type of the math vector.
+     */
     template<class MathVector3T_>
     struct transform_3dt {
         public:
@@ -657,6 +782,11 @@ namespace sgjk  {
         }
 
         public:
+        /**
+         * @brief Transforms a point using the rotation and position in 3D space.
+         * @param point The point to transform.
+         * @return The transformed point.
+         */
         [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
             // Dear compiler, PLEASE, optimize this
             const scalar_type cosX = SGJK_COS(radians_.x);
@@ -707,11 +837,9 @@ namespace sgjk  {
     /// @brief specialization of transform_3dt for default vector3d class.
     typedef transform_3dt<SGJK_DEFAULT_VEC3D> transform3d;
     
-
     /**
-     * @brief a wrapper for any collider type.
-     *
-     * @tparam MathVectorAnyDT_ the type of the math vector to use. The vector must implement math operators, 'dot', 'cross', and 'normalized'.
+     * @brief A template struct that wraps any type of collider with a specific math vector type. It provides a polymorphic interface for colliders, allowing for querying the furthest point in a specific direction and checking validity.
+     * @tparam MathVectorAnyDT_ The type of the math vector.
      */
     template<class MathVectorAnyDT_>
     struct collider_wrapper_anyd final {
@@ -809,14 +937,31 @@ namespace sgjk  {
         }
         
         public:
+        /**
+         * @brief Gets the furthest point of the collider in a specific direction.
+         * @tparam Transform2DT_ The type of the transform to apply to the collider.
+         * @param direction The direction vector.
+         * @param transform The transform to apply to the collider.
+         * @return The furthest point of the collider in the specified direction.
+         */
         template<class Transform2DT_>
         [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const Transform2DT_& transform) const noexcept {
             return wrapped_->get_furthest_point(direction, transform);
         }
+        /**
+         * @brief Gets some point on collider surface.
+         * @tparam Transform2DT_ The type of the transform to apply to the collider.
+         * @param transform The transform to apply to the collider.
+         * @return Some point of the collider.
+         */
         template<class Transform2DT_>
         [[nodiscard]] math_vector_type get_some_point(const Transform2DT_& transform) const noexcept {
             return wrapped_->get_some_point(transform);
         }
+        /**
+         * @brief Checks if the collider is valid.
+         * @return True if the collider is valid, false otherwise.
+         */
         [[nodiscard]] bool is_valid() const noexcept {
             return (wrapped_ != nullptr) && (wrapped_->is_valid());
         }
@@ -827,10 +972,9 @@ namespace sgjk  {
     typedef collider_wrapper_anyd<SGJK_DEFAULT_VEC3D> collider_wrapper_3d;
 
     /**
-     * @brief a polygon collider for any dimension.
-     *
-     * @tparam MathVectorAnyDT_ the type of the math vector to use. The vector must implement math operators, 'dot', 'cross', and 'normalized'.
-     * @tparam ContainerT_ the type of the container to use for storing simplex_. The container type must implement '[]' operator, 'empty', 'size', work with iterators.
+     * @brief A template struct representing a polygon collider with a specific math vector type. It provides a interface for colliders, allowing for querying the furthest point in a specific direction and checking validity.
+     * @tparam MathVectorAnyDT_ The type of the math vector.
+     * @tparam ContainerT_ The type of the container used to store the vertices.
      */
     template<class MathVectorAnyDT_, class ContainerT_ = SGJK_DEFAULT_CONTAINER<MathVectorAnyDT_>>
     struct polygon_collider_anydt final {
@@ -870,6 +1014,13 @@ namespace sgjk  {
         }
 
         public:
+        /**
+         * @brief Gets the furthest point of the collider verteces in a specific direction.
+         * @tparam Transform2DT_ The type of the transform to apply to the collider.
+         * @param direction The direction vector.
+         * @param transform The transform to apply to the collider.
+         * @return The furthest point of the collider in the specified direction.
+         */
         template<class Transform2DT_>
         [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const Transform2DT_& transform) const noexcept {
             math_vector_type furthestPoint = transform.transformed(vertices_[0]);
@@ -884,10 +1035,20 @@ namespace sgjk  {
             }   
             return furthestPoint;
         }
+        /**
+         * @brief Gets some point of the collider.
+         * @tparam Transform2DT_ The type of the transform to apply to the collider.
+         * @param transform The transform to apply to the collider.
+         * @return Transformed first point of collider verteces.
+         */
         template<class Transform2DT_>
         [[nodiscard]] math_vector_type get_some_point(const Transform2DT_& transform) const noexcept {
             return transform.transformed(vertices_[0]);
         }
+        /**
+         * @brief Checks if the collider is valid.
+         * @return True if the vertices isnt empty is valid, false otherwise.
+         */
         [[nodiscard]] bool is_valid() const noexcept {
             return !vertices_.empty();
         }
@@ -905,9 +1066,8 @@ namespace sgjk  {
     typedef polygon_collider_anydt<SGJK_DEFAULT_VEC3D> polygon_collider_3d;
 
     /**
-     * @brief a circle collider for any dimension.
-     *
-     * @tparam MathVectorAnyDT_ the type of the math vector to use. The vector must implement math operators, 'dot', 'cross', and 'normalized'.
+     * @brief A template struct representing a circle collider with a specific math vector type. It provides a interface for colliders, allowing for querying the furthest point in a specific direction and checking validity.
+     * @tparam MathVectorAnyDT_ The type of the math vector.
      */
     template<class MathVectorAnyDT_>
     struct circle_collider_anydt final {
@@ -945,14 +1105,31 @@ namespace sgjk  {
         }
 
         public:
+        /**
+         * @brief Gets the furthest point of the collider in a specific direction.
+         * @tparam Transform2DT_ The type of the transform to apply to the collider.
+         * @param direction The direction vector.
+         * @param transform The transform to apply to the collider.
+         * @return The furthest point of the collider in the specified direction.
+         */
         template<class Transform2DT_>
         [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const Transform2DT_& transform) const noexcept {
             return transform.transformed(centre_) + SGJK_NORMALIZED(direction) * radius_;
         }
+        /**
+         * @brief Gets some point of the collider.
+         * @tparam Transform2DT_ The type of the transform to apply to the collider.
+         * @param transform The transform to apply to the collider.
+         * @return Transformed centre of the circe.
+         */
         template<class Transform2DT_>
         [[nodiscard]] math_vector_type get_some_point(const Transform2DT_& transform) const noexcept {
             return transform.transformed(centre_);
         }
+        /**
+         * @brief Checks if the collider is valid.
+         * @return Always true.
+         */
         [[nodiscard]] bool is_valid() const noexcept {
             return true;
         }
@@ -975,7 +1152,19 @@ namespace sgjk  {
     /// @brief specialization of circle_collider_anydt for 3d.
     typedef circle_collider_anydt<SGJK_DEFAULT_VEC3D> circle_collider_3d;
 
-
+     /**
+     * @brief Computes the support vector(valid Minkowsky differens point) for two colliders in a specific direction.
+     * @tparam FirstColliderT_ The type of the first collider.
+     * @tparam SecondColliderT_ The type of the second collider.
+     * @tparam FirstTransformT_ The type of the transform to apply to the first collider.
+     * @tparam SecondTransformT_ The type of the transform to apply to the second collider.
+     * @param direction The direction vector.
+     * @param first The first collider.
+     * @param second The second collider.
+     * @param firstTransform The transform to apply to the first collider.
+     * @param secondTransform The transform to apply to the second collider.
+     * @return The support vector for the two colliders in the specified direction.
+     */
     template<class FirstColliderT_, class SecondColliderT_, class FirstTransformT_ = empty_transform<typename FirstColliderT_::math_vector_type>, class SecondTransformT_ = empty_transform<typename SecondColliderT_::math_vector_type>>
     [[nodiscard]] static typename FirstColliderT_::math_vector_type support(
             const typename FirstColliderT_::math_vector_type& direction,
@@ -988,9 +1177,8 @@ namespace sgjk  {
     }
 
     /**
-     * @brief a collision detector for 2D vectors.
-     *
-     * @tparam MathVector2DT_ the type of the math vector to use.
+     * @brief A template struct representing a 2D collision detector for a specific math vector type.
+     * @tparam MathVector2DT_ The type of the math vector.
      */
     template<class MathVector2DT_>
     struct collision_detecter_2dt final {
@@ -1003,16 +1191,19 @@ namespace sgjk  {
         math_vector_type simplex_[3u];
 
         public:
-        /**  
-         * @brief Checks for collision between 2D colliders. Does not check the validity of the colliders before starting the algorithm. Check 'is_collide' for safety.
-         * 
-         * @tparam FirstCollider2DT_ the first type of collider. Must have method "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider2DT_ the second type of collider. Must have method "get_furthest_point" that do not modify the object's state.
-         * @param first first collider.
-         * @param second second collider.
-         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
-         * @return Whether a collision is present.
-         */ 
+        /**
+         * @brief Checks if two colliders collide without checking their validity.
+         * @tparam FirstCollider2DT_ The type of the first collider.
+         * @tparam SecondCollider2DT_ The type of the second collider.
+         * @tparam FirstTransform2DT_ The type of the transform to apply to the first collider.
+         * @tparam SecondTransform2DT_ The type of the transform to apply to the second collider.
+         * @param first The first collider.
+         * @param second The second collider.
+         * @param maxIterationCount The maximum number of iterations to perform.
+         * @param firstTransform The transform to apply to the first collider.
+         * @param secondTransform The transform to apply to the second collider.
+         * @return True if the colliders collide, false otherwise.
+         */
         template<class FirstCollider2DT_, class SecondCollider2DT_, class FirstTransform2DT_ = empty_transform<math_vector_type>, class SecondTransform2DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide_unsafe(
             const FirstCollider2DT_& first,
@@ -1076,16 +1267,19 @@ namespace sgjk  {
             }
             return false;
         }
-        /**  
-         * @brief Checks for collision between 2D colliders. Checks the validity of the colliders before starting the algorithm.
-         * 
-         * @tparam FirstCollider2DT_ the first type of collider. Must have method and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider2DT_ the second type of collider. Must have method "get_furthest_point" that do not modify the object's state.
-         * @param first first collider.
-         * @param second second collider.
-         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
-         * @return Whether a collision is present.
-         */ 
+        /**
+         * @brief Checks if two colliders collide with checking their validity.
+         * @tparam FirstCollider2DT_ The type of the first collider.
+         * @tparam SecondCollider2DT_ The type of the second collider.
+         * @tparam FirstTransform2DT_ The type of the transform to apply to the first collider.
+         * @tparam SecondTransform2DT_ The type of the transform to apply to the second collider.
+         * @param first The first collider.
+         * @param second The second collider.
+         * @param maxIterationCount The maximum number of iterations to perform.
+         * @param firstTransform The transform to apply to the first collider.
+         * @param secondTransform The transform to apply to the second collider.
+         * @return True if the colliders collide, false otherwise.
+         */
         template<class FirstCollider2DT_, class SecondCollider2DT_, class FirstTransform2DT_ = empty_transform<math_vector_type>, class SecondTransform2DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide(
             const FirstCollider2DT_& first,
@@ -1104,6 +1298,19 @@ namespace sgjk  {
 
             return is_collide_unsafe(first, second, maxIterationCount, firstTransform, secondTransform);
         }
+        /**
+         * @brief Obtain the penetration vector between two colliders.
+         * @tparam FirstCollider2DT_ The type of the first collider.
+         * @tparam SecondCollider2DT_ The type of the second collider.
+         * @tparam FirstTransform2DT_ The type of the transform to apply to the first collider.
+         * @tparam SecondTransform2DT_ The type of the transform to apply to the second collider.
+         * @param first The first collider.
+         * @param second The second collider.
+         * @param maxIterationCount The maximum number of iterations to perform.
+         * @param firstTransform The transform to apply to the first collider.
+         * @param secondTransform The transform to apply to the second collider.
+         * @return The penetration vector between two colliders.
+         */
         template<class FirstCollider2DT_, class SecondCollider2DT_, class FirstTransform2DT_ = empty_transform<math_vector_type>, class SecondTransform2DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] math_vector_type get_penetration_vector_unsafe(
             const FirstCollider2DT_& first,
@@ -1169,9 +1376,8 @@ namespace sgjk  {
     typedef collision_detecter_2dt<SGJK_DEFAULT_VEC2D> collision_detecter_2d;
 
     /**
-     * @brief a collision detector for 3D vectors.
-     *
-     * @tparam MathVector3DT_ the type of the math vector to use.
+     * @brief A template struct representing a 3D collision detector for a specific math vector type.
+     * @tparam MathVector3DT_ The type of the math vector.
      */
     template<class MathVector3DT_>
     struct collision_detecter_3dt final {
@@ -1184,16 +1390,19 @@ namespace sgjk  {
         math_vector_type simplex_[4u];
 
         public:
-        /**  
-         * @brief Checks for collision between 3D colliders. Does not check the validity of the colliders before starting the algorithm. Check 'is_collide' for safety.
-         * 
-         * @tparam FirstCollider3DT_ the first type of collider. Must have method  and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider3DT_ the second type of collider. Must have method  and "get_furthest_point" that do not modify the object's state.
-         * @param first first collider.
-         * @param second second collider.
-         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
-         * @return Whether a collision is present.
-         */ 
+        /**
+         * @brief Checks if two colliders collide without checking their validity.
+         * @tparam FirstCollider3DT_ The type of the first collider.
+         * @tparam SecondCollider3DT_ The type of the second collider.
+         * @tparam FirstTransform3DT_ The type of the transform to apply to the first collider.
+         * @tparam SecondTransform3DT_ The type of the transform to apply to the second collider.
+         * @param first The first collider.
+         * @param second The second collider.
+         * @param maxIterationCount The maximum number of iterations to perform.
+         * @param firstTransform The transform to apply to the first collider.
+         * @param secondTransform The transform to apply to the second collider.
+         * @return True if the colliders collide, false otherwise.
+         */
         template<class FirstCollider3DT_, class SecondCollider3DT_, class FirstTransform3DT_ = empty_transform<math_vector_type>, class SecondTransform3DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide_unsafe(
             const FirstCollider3DT_& first,
@@ -1281,16 +1490,19 @@ namespace sgjk  {
             }
             return false;
         }
-        /**  
-         * @brief Checks for collision between 3D colliders. Checks the validity of the colliders before starting the algorithm.
-         * 
-         * @tparam FirstCollider3DT_ the first type of collider. Must have method and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider3DT_ the second type of collider. Must have method  and "get_furthest_point" that do not modify the object's state.
-         * @param first first collider.
-         * @param second second collider.
-         * @param maxIterationCount the maximum number of iterations, after which false will be returned.
-         * @return Whether a collision is present.
-         */ 
+        /**
+         * @brief Checks if two colliders collide with checking their validity.
+         * @tparam FirstCollider3DT_ The type of the first collider.
+         * @tparam SecondCollider3DT_ The type of the second collider.
+         * @tparam FirstTransform3DT_ The type of the transform to apply to the first collider.
+         * @tparam SecondTransform3DT_ The type of the transform to apply to the second collider.
+         * @param first The first collider.
+         * @param second The second collider.
+         * @param maxIterationCount The maximum number of iterations to perform.
+         * @param firstTransform The transform to apply to the first collider.
+         * @param secondTransform The transform to apply to the second collider.
+         * @return True if the colliders collide, false otherwise.
+         */
         template<class FirstCollider3DT_, class SecondCollider3DT_, class FirstTransform3DT_ = empty_transform<math_vector_type>, class SecondTransform3DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide(
             const FirstCollider3DT_& first,
@@ -1310,6 +1522,20 @@ namespace sgjk  {
             return is_collide_unsafe(first, second, maxIterationCount, firstTransform, secondTransform);
         }
 
+        /**
+         * @brief Obtains the penetration vector between two colliders.
+         * @tparam FirstCollider3DT_ The type of the first collider.
+         * @tparam SecondCollider3DT_ The type of the second collider.
+         * @tparam FirstTransform3DT_ The type of the transform to apply to the first collider.
+         * @tparam SecondTransform3DT_ The type of the transform to apply to the second collider.
+         * @param first The first collider.
+         * @param second The second collider.
+         * @param toleranceDistance The tolerance distance for the penetration vector.
+         * @param maxIterationCount The maximum number of iterations to perform.
+         * @param firstTransform The transform to apply to the first collider.
+         * @param secondTransform The transform to apply to the second collider.
+         * @return The penetration vector between the colliders.
+         */
         template<class FirstCollider3DT_, class SecondCollider3DT_, class FirstTransform3DT_ = empty_transform<math_vector_type>, class SecondTransform3DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] math_vector_type get_penetration_vector_unsafe(
             const FirstCollider3DT_& first,
