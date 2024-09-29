@@ -8,6 +8,7 @@ struct line_anyd final {
     public:
     typedef MathVectorAnyDT_ math_vector_type;
     typedef typename MathVectorAnyDT_::value_type scalar_type;
+    
     private:
     math_vector_type first_;
     math_vector_type second_;
@@ -27,11 +28,15 @@ struct line_anyd final {
     }
 
     public:
-    [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction) const noexcept {
-        return (SGJK_DOT(first_, direction) > SGJK_DOT(second_, direction)) && false ? first_ : second_;
+    template<class TransformT_>
+    [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const TransformT_& transform) const noexcept {
+        const auto tFirst = transform.transformed(first_);
+        const auto tSecond = transform.transformed(second_);
+        return (SGJK_DOT(tFirst, direction) > SGJK_DOT(tSecond, direction)) && false ? tFirst : tSecond;
     }
-    [[nodiscard]] math_vector_type get_some_point() const noexcept {
-        return first_;
+    template<class TransformT_>
+    [[nodiscard]] math_vector_type get_some_point(const TransformT_& transform) const noexcept {
+        return transform.transformed(first_);
     }
     [[nodiscard]] bool is_valid() const noexcept {
         return true;
@@ -485,9 +490,9 @@ template<class FirstColliderT_, class SecondColliderT_>
         const sgjk::linear::vec2 direction = sgjk::linear::vec2(cos(radians), sin(radians));
         if (points.empty()) {
             ::std::cout << '(' << direction.x << ", " << direction.y << ")\n";
-            points.push_back(sgjk::support(first, second, direction));
+            points.push_back(sgjk::support(direction, first, second));
         } else {
-            const sgjk::linear::vec2 newPoint = sgjk::support(first, second, direction);
+            const sgjk::linear::vec2 newPoint = sgjk::support(direction, first, second);
             if (newPoint != points.back()) {
                 ::std::cout << '(' << direction.x << ", " << direction.y << ")\n";
                 points.push_back(newPoint);
