@@ -1,12 +1,36 @@
+/*  sgjk_head.hpp
+    MIT License
+
+    Copyright (c) 2024 Aidar Shigapov
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+// SGJK - "SIMPLE"(NO) GJK
+
 #ifndef SGJK_HEAD_HPP_
 #define SGJK_HEAD_HPP_ 1
-
-#include <iostream>
 
 #if (!(defined SGJK_ASSERT))
 #   include <cassert>
 #   define SGJK_ASSERT(expr__) assert(expr__)
-#endif // !defined SGJK_VEC3D
+#endif // !defined SGJK_ASSERT
 
 #if (!(defined SGJK_DEFAULT_CONTAINER))
 #   include <vector>
@@ -21,7 +45,7 @@
 #if (!(defined SGJK_SIZE_TYPE))
 #   include <cstdint>
 #   define SGJK_SIZE_TYPE size_t // long long a BIT faster with O2 or O3
-#endif // !defined SGJK_MOVE
+#endif // !defined SGJK_SIZE_TYPE
 
 #if (!(defined SGJK_MAX_VALUE_OF))
 #   include <limits>
@@ -31,7 +55,17 @@
 #if (!(defined SGJK_ABS))
 #   include <cmath>
 #   define SGJK_ABS(val__) (::std::abs(val__))
-#endif // !defined SGJK_MAX_VALUE_OF
+#endif // !defined SGJK_ABS
+
+#if (!(defined SGJK_COS))
+#   include <cmath>
+#   define SGJK_COS(val__) (::std::cos(val__))
+#endif // !defined SGJK_COS
+
+#if (!(defined SGJK_SIN))
+#   include <cmath>
+#   define SGJK_SIN(val__) (::std::cos(val__))
+#endif // !defined SGJK_SIN
 
 #if (!(defined SGKJ_NOT_IMPLEMENT_VECTORS)) /////////////////////////////////////////////////////////////
 #if (!(defined SGJK_DEFAULT_VEC2D))
@@ -51,14 +85,22 @@
 #define SGJK__2D_OPER_SCALAR_CONST(oper) \
     template<class ScalarType> [[nodiscard]] vec2T<ScalarType> operator oper (const vec2T<ScalarType>& vec, const ScalarType& scalar) noexcept { return vec2T<ScalarType>(vec.x oper scalar, vec.y oper scalar); }\
     template<class ScalarType> [[nodiscard]] vec2T<ScalarType> operator oper (const ScalarType& scalar, const vec2T<ScalarType>& vec) noexcept { return vec2T<ScalarType>(scalar oper vec.x, scalar oper vec.y); }
+#define SGJK__2D_OPER_SCALAR_BOOL(oper, del) \
+    template<class ScalarType> [[nodiscard]] bool operator oper (const vec2T<ScalarType>& vec, const ScalarType& scalar) noexcept { return ((vec.x oper scalar) del (vec.y oper scalar));}\
+    template<class ScalarType> [[nodiscard]] bool operator oper (const ScalarType& scalar, const vec2T<ScalarType>& vec) noexcept { return ((scalar oper vec.x) del (scalar oper vec.y));}
 #define SGJK__2D_OPER_VEC_MUT(oper) template<class ScalarType> vec2T<ScalarType>& operator oper (vec2T<ScalarType>& vec, const vec2T<ScalarType>& other) noexcept { vec.x oper other.x; vec.y oper other.y; return vec;}
 #define SGJK__2D_OPER_VEC_CONST(oper) template<class ScalarType> [[nodiscard]] vec2T<ScalarType> operator oper (const vec2T<ScalarType>& vec, const vec2T<ScalarType>& other) noexcept { return vec2T<ScalarType>(vec.x oper other.x, vec.y oper other.y); }
 #define SGJK__2D_OPER_VEC_BOOL(oper, del) template<class ScalarType> [[nodiscard]] bool operator oper (const vec2T<ScalarType>& left, const vec2T<ScalarType>& rigth) noexcept { return ((left.x oper rigth.x) del (left.y oper rigth.y));}
-
+/*GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG*/
+/*GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG*/
+/*GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG*/
 #define SGJK__3D_OPER_SCALAR_MUT(oper) template<class ScalarType> vec3T<ScalarType>& operator oper (vec3T<ScalarType>& vec, const ScalarType& scalar) noexcept { vec.x oper scalar; vec.y oper scalar; vec.z oper scalar; return vec;}
 #define SGJK__3D_OPER_SCALAR_CONST(oper) \
     template<class ScalarType> [[nodiscard]] vec3T<ScalarType> operator oper (const vec3T<ScalarType>& vec, const ScalarType& scalar) noexcept { return vec3T<ScalarType>(vec.x oper scalar, vec.y oper scalar, vec.z oper scalar); }\
     template<class ScalarType> [[nodiscard]] vec3T<ScalarType> operator oper (const ScalarType& scalar, const vec3T<ScalarType>& vec) noexcept { return vec3T<ScalarType>(scalar oper vec.x, scalar oper vec.y, scalar oper vec.z); }
+#define SGJK__3D_OPER_SCALAR_BOOL(oper, del) \
+    template<class ScalarType> [[nodiscard]] bool operator oper (const vec3T<ScalarType>& vec, const ScalarType& scalar) noexcept { return ((vec.x oper scalar) del (vec.y oper scalar) del (vec.z oper scalar));}\
+    template<class ScalarType> [[nodiscard]] bool operator oper (const ScalarType& scalar, const vec3T<ScalarType>& vec) noexcept { return ((scalar oper vec.x) del (scalar oper vec.y) del (scalar oper vec.z));}
 #define SGJK__3D_OPER_VEC_MUT(oper) template<class ScalarType> vec3T<ScalarType>& operator oper (vec3T<ScalarType>& vec, const vec3T<ScalarType>& other) noexcept { vec.x oper other.x; vec.y oper other.y; vec.z oper other.z; return vec;}
 #define SGJK__3D_OPER_VEC_CONST(oper) template<class ScalarType> [[nodiscard]] vec3T<ScalarType> operator oper (const vec3T<ScalarType>& vec, const vec3T<ScalarType>& other) noexcept { return vec3T<ScalarType>(vec.x oper other.x, vec.y oper other.y, vec.z oper other.z); }
 #define SGJK__3D_OPER_VEC_BOOL(oper, del) template<class ScalarType> [[nodiscard]] bool operator oper (const vec3T<ScalarType>& left, const vec3T<ScalarType>& rigth) noexcept { return ((left.x oper rigth.x) del (left.y oper rigth.y) del (left.z oper rigth.z));}
@@ -168,6 +210,9 @@ namespace sgjk  {
         SGJK__2D_OPER_SCALAR_CONST(-)
         SGJK__2D_OPER_SCALAR_CONST(*)
         SGJK__2D_OPER_SCALAR_CONST(/)
+
+        SGJK__2D_OPER_SCALAR_BOOL(==, &&);
+        SGJK__2D_OPER_SCALAR_BOOL(!=, ||);
 
         SGJK__2D_OPER_VEC_MUT(+=)
         SGJK__2D_OPER_VEC_MUT(-=)
@@ -292,6 +337,9 @@ namespace sgjk  {
         SGJK__3D_OPER_SCALAR_CONST(-)
         SGJK__3D_OPER_SCALAR_CONST(*)
         SGJK__3D_OPER_SCALAR_CONST(/)
+
+        SGJK__3D_OPER_SCALAR_BOOL(==, &&);
+        SGJK__3D_OPER_SCALAR_BOOL(!=, ||);
 
         SGJK__3D_OPER_VEC_MUT(+=)
         SGJK__3D_OPER_VEC_MUT(-=)
@@ -420,6 +468,244 @@ namespace sgjk  {
 
         }
     };
+    template<class MathVectorAnyDT_>
+    struct transform_wrapper_anydt {
+        public:
+        typedef MathVectorAnyDT_ math_vector_type;
+        typedef typename MathVectorAnyDT_::value_type scalar_type;
+
+        private:
+        struct transform_wrapper_support {
+            public:
+            virtual ~transform_wrapper_support() = default;
+
+            public:
+            [[nodiscard]] virtual math_vector_type transformed(const math_vector_type& point) const noexcept = 0;
+            [[nodiscard]] virtual transform_wrapper_support* clone() const = 0;
+        };
+
+        template<class ToWrappT_>
+        struct transform_wrapper_support_t : transform_wrapper_support {
+            public:
+            ToWrappT_ transform_;
+
+            public:
+            transform_wrapper_support_t(const ToWrappT_& transform) : transform_(transform) {
+
+            }
+            transform_wrapper_support_t(ToWrappT_&& transform) noexcept : transform_(SGJK_MOVE(transform)) {
+
+            }
+
+            public:
+            [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept override {
+                return transform_.transformed(point);
+            }
+            [[nodiscard]] transform_wrapper_support* clone() const override { 
+                return new transform_wrapper_support_t(*this);
+            }
+        };
+
+        private:
+        transform_wrapper_support* wrapped_;
+
+        public:
+        transform_wrapper_anydt() noexcept : wrapped_(nullptr) {
+
+        }
+        transform_wrapper_anydt(const transform_wrapper_support& other) {
+            if (other.wrapped_ != nullptr) {
+                wrapped_ = other.wrapped_->clone();
+                SGJK_ASSERT(wrapped_ != nullptr);
+            } else {
+                wrapped_ = nullptr;
+            }
+        }
+        transform_wrapper_anydt(transform_wrapper_anydt&& other) noexcept : wrapped_(other.wrapped_) {
+            other.wrapped_ = nullptr;
+        }
+        template<class TransfromT_>
+        transform_wrapper_anydt(const TransfromT_& transform) : wrapped_(new transform_wrapper_support_t<TransfromT_>(transform)) {
+            static_assert(is_realy_the_same<typename TransfromT_::math_vector_type, math_vector_type>::value, "math_vector_type of transform must be same as math_vector_type of wrapper");
+            SGJK_ASSERT(wrapped_ != nullptr);
+        }
+        template<class TransfromT_>
+        transform_wrapper_anydt(typename really_remove_referens<TransfromT_>::type&& transform) noexcept : wrapped_(new transform_wrapper_support_t<TransfromT_>(SGJK_MOVE(transform))) {
+            static_assert(is_realy_the_same<typename TransfromT_::math_vector_type, math_vector_type>::value, "math_vector_type of transform must be same as math_vector_type of wrapper");
+        }
+
+        public:
+        ~transform_wrapper_anydt() {
+            if (wrapped_) {
+                delete wrapped_;
+                wrapped_ = nullptr;
+            }
+        }
+        
+        public:
+        transform_wrapper_anydt& operator=(const transform_wrapper_anydt& other) {
+            if (wrapped_) {
+                delete wrapped_;
+                wrapped_ = nullptr;
+            }
+
+            if (other.transform_ != nullptr) {
+                wrapped_ = other.wrapped_->clone();
+                SGJK_ASSERT(wrapped_ != nullptr);
+            }
+            return *this;
+        }
+        transform_wrapper_anydt& operator=(transform_wrapper_anydt&& other) {
+            if (wrapped_)
+                delete wrapped_;
+            wrapped_ = other.wrapped_;
+            other.wrapped_ = nullptr;
+            return *this;
+        }
+        
+        public:
+        [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
+            return wrapped_->transformed(point);
+        }
+    };
+    template<class MathVectorAnyDT_>
+    struct empty_transform {
+        public:
+        typedef MathVectorAnyDT_ math_vector_type;
+
+        public:
+        empty_transform() {
+
+        }
+
+        public:
+        [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
+            return point;
+        }
+    };
+
+    template<class MathVector2T_>
+    struct transform_2dt {
+        public:
+        typedef MathVector2T_ math_vector_type;
+        typedef typename MathVector2T_::value_type scalar_type;
+
+        private:
+        math_vector_type position_;
+        scalar_type radians_;
+
+        public:
+        transform_2dt() : position_(), radians_() {
+
+        }
+        transform_2dt(const math_vector_type& position, const scalar_type& radians) : position_(position), radians_(radians) {
+
+        }
+
+        public:
+        [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
+            const scalar_type cos_theta = SGJK_COS(radians_);
+            const scalar_type sin_theta = SGJK_SIN(radians_);
+
+            return math_vector_type(
+                cos_theta * point.x - sin_theta * point.y,
+                sin_theta * point.x + cos_theta * point.y
+            ) + position_;
+        }
+
+        public:
+        void move(const math_vector_type& vel) noexcept {
+            position_ += vel;
+        }
+        void rotate(const scalar_type& radDelta) noexcept {
+            radians_ += radDelta;
+        }
+        
+        public:
+        [[nodiscard]] const math_vector_type& get_position() const noexcept {
+            return position_;
+        }
+        [[nodiscard]] math_vector_type& get_position() noexcept {
+            return position_;
+        }
+        [[nodiscard]] const scalar_type& get_rotation() const noexcept {
+            return radians_;
+        }
+        [[nodiscard]] scalar_type& get_rotation() noexcept {
+            return radians_;
+        }
+    };
+    /// @brief specialization of transform_3dt for default vector2d class.
+    typedef transform_2dt<SGJK_DEFAULT_VEC2D> transform2d;
+
+    template<class MathVector3T_>
+    struct transform_3dt {
+        public:
+        typedef MathVector3T_ math_vector_type;
+        typedef typename MathVector3T_::value_type scalar_type;
+
+        private:
+        math_vector_type position_;
+        math_vector_type radians_;
+
+        public:
+        transform_3dt() : position_(), radians_() {
+
+        }
+        transform_3dt(const math_vector_type& position, const math_vector_type& radians) : position_(position), radians_(radians) {
+
+        }
+
+        public:
+        [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
+            // Dear compiler, PLEASE, optimize this
+            const scalar_type cosX = SGJK_COS(radians_.x);
+            const scalar_type sinX = SGJK_SIN(radians_.x);
+            const scalar_type cosY = SGJK_COS(radians_.y);
+            const scalar_type sinY = SGJK_SIN(radians_.y);
+            const scalar_type cosZ = SGJK_COS(radians_.z);
+            const scalar_type sinZ = SGJK_SIN(radians_.z);
+
+            // MUHAHA. im crying.
+            return math_vector_type(
+                (cosY * cosZ * point.x) +
+                (cosY * sinZ * point.y) -
+                (sinY * point.z),
+
+                (sinX * sinY * cosZ - cosX * sinZ * point.x) +
+                (sinX * sinY * sinZ + cosX * cosZ * point.y) +
+                (sinX * cosY * point.z),
+
+                (cosX * sinY * cosZ + sinX * sinZ * point.x) +
+                (cosX * sinY * sinZ - sinX * cosZ * point.y) +
+                (cosX * cosY * point.z)
+            ) + position_;
+        }
+
+        public:
+        void move(const math_vector_type& vel) noexcept {
+            position_ += vel;
+        }
+        void rotate(const math_vector_type& radDelta) noexcept {
+            radians_ += radDelta;
+        }
+
+        public:
+        [[nodiscard]] const math_vector_type& get_position() const noexcept {
+            return position_;
+        }
+        [[nodiscard]] math_vector_type& get_position() noexcept {
+            return position_;
+        }
+        [[nodiscard]] const math_vector_type& get_rotation() const noexcept {
+            return radians_;
+        }
+        [[nodiscard]] math_vector_type& get_rotation() noexcept {
+            return radians_;
+        }
+    };
+    /// @brief specialization of transform_3dt for default vector3d class.
+    typedef transform_3dt<SGJK_DEFAULT_VEC3D> transform3d;
     
 
     /**
@@ -438,8 +724,8 @@ namespace sgjk  {
             virtual ~collider_wrapper_support() = default;
 
             public:
-            [[nodiscard]] virtual math_vector_type get_furthest_point(const math_vector_type& direction) const noexcept = 0;
-            [[nodiscard]] virtual math_vector_type get_some_point() const noexcept = 0;
+            [[nodiscard]] virtual math_vector_type get_furthest_point(const math_vector_type& direction, const transform_wrapper_anydt<math_vector_type>& transform) const noexcept = 0;
+            [[nodiscard]] virtual math_vector_type get_some_point(const transform_wrapper_anydt<math_vector_type>& transform) const noexcept = 0;
             [[nodiscard]] virtual bool is_valid() const noexcept = 0;
             [[nodiscard]] virtual collider_wrapper_support* clone() const = 0;
         };
@@ -458,8 +744,8 @@ namespace sgjk  {
             }
 
             public:
-            [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction) const noexcept override { return collider_.get_furthest_point(direction); };
-            [[nodiscard]] math_vector_type get_some_point() const noexcept override { return collider_.get_some_point();};
+            [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const transform_wrapper_anydt<math_vector_type>& transform) const noexcept override { return collider_.get_furthest_point(direction, transform); }
+            [[nodiscard]] math_vector_type get_some_point(const transform_wrapper_anydt<math_vector_type>& transform) const noexcept override { return collider_.get_some_point(transform); }
             [[nodiscard]] bool is_valid() const noexcept override { return collider_.is_valid();};
             [[nodiscard]] collider_wrapper_support* clone() const override { return new collider_wrapper_support_t(*this);};
 
@@ -509,7 +795,7 @@ namespace sgjk  {
             }
 
             if (other.collider_ != nullptr) {
-                wrapped_ = other.collider_->clone();
+                wrapped_ = other.wrapped_->clone();
                 SGJK_ASSERT(wrapped_ != nullptr);
             }
             return *this;
@@ -523,11 +809,13 @@ namespace sgjk  {
         }
         
         public:
-        [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction) const {
-            return wrapped_->get_furthest_point(direction);
+        template<class Transform2DT_>
+        [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const Transform2DT_& transform) const noexcept {
+            return wrapped_->get_furthest_point(direction, transform);
         }
-        [[nodiscard]] math_vector_type get_some_point() const {
-            return wrapped_->get_some_point();
+        template<class Transform2DT_>
+        [[nodiscard]] math_vector_type get_some_point(const Transform2DT_& transform) const noexcept {
+            return wrapped_->get_some_point(transform);
         }
         [[nodiscard]] bool is_valid() const noexcept {
             return (wrapped_ != nullptr) && (wrapped_->is_valid());
@@ -572,20 +860,33 @@ namespace sgjk  {
         }
 
         public:
-        [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction) const {
-            math_vector_type furthestPoint = vertices_[0];
+        polygon_collider_anydt& operator=(const polygon_collider_anydt& other) {
+            vertices_ = other.vertices_;
+            return *this;
+        }
+        polygon_collider_anydt& operator=(polygon_collider_anydt&& other) {
+            vertices_ = SGJK_MOVE(other.vertices_);
+            return *this;
+        }
+
+        public:
+        template<class Transform2DT_>
+        [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const Transform2DT_& transform) const noexcept {
+            math_vector_type furthestPoint = transform.transformed(vertices_[0]);
             scalar_type maxProjection = SGJK_DOT(furthestPoint, direction); 
             for (SGJK_SIZE_TYPE i = 1; i < (SGJK_SIZE_TYPE)vertices_.size(); ++i) {
-                const scalar_type projection = SGJK_DOT(vertices_[i], direction);
+                const math_vector_type currentPoint = transform.transformed(vertices_[i]);
+                const scalar_type projection = SGJK_DOT(currentPoint, direction);
                 if (projection > maxProjection) {
                     maxProjection = projection;
-                    furthestPoint = vertices_[i];
+                    furthestPoint = currentPoint;
                 }
             }   
             return furthestPoint;
         }
-        [[nodiscard]] math_vector_type get_some_point() const {
-            return vertices_[0];
+        template<class Transform2DT_>
+        [[nodiscard]] math_vector_type get_some_point(const Transform2DT_& transform) const noexcept {
+            return transform.transformed(vertices_[0]);
         }
         [[nodiscard]] bool is_valid() const noexcept {
             return !vertices_.empty();
@@ -631,13 +932,26 @@ namespace sgjk  {
         circle_collider_anydt(circle_collider_anydt&& other) noexcept : centre_(SGJK_MOVE(other.centre_)), radius_(SGJK_MOVE(other.radius_)) {
 
         }
+        public:
+        circle_collider_anydt& operator=(const circle_collider_anydt& other) {
+            centre_ = other.centre_;
+            radius_ = other.radius_;
+            return *this;
+        }
+        circle_collider_anydt& operator=(circle_collider_anydt&& other) {
+            centre_ = SGJK_MOVE(other.centre_);
+            radius_ = SGJK_MOVE(other.radius_);
+            return *this;
+        }
 
         public:
-        [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction) const noexcept {
-            return (SGJK_NORMALIZED(direction) * radius_) + centre_;
+        template<class Transform2DT_>
+        [[nodiscard]] math_vector_type get_furthest_point(const math_vector_type& direction, const Transform2DT_& transform) const noexcept {
+            return transform.transformed(centre_) + SGJK_NORMALIZED(direction) * radius_;
         }
-        [[nodiscard]] math_vector_type get_some_point() const noexcept {
-            return centre_;
+        template<class Transform2DT_>
+        [[nodiscard]] math_vector_type get_some_point(const Transform2DT_& transform) const noexcept {
+            return transform.transformed(centre_);
         }
         [[nodiscard]] bool is_valid() const noexcept {
             return true;
@@ -662,13 +976,15 @@ namespace sgjk  {
     typedef circle_collider_anydt<SGJK_DEFAULT_VEC3D> circle_collider_3d;
 
 
-    template<class FirstColliderT_, class SecondColliderT_>
+    template<class FirstColliderT_, class SecondColliderT_, class FirstTransformT_ = empty_transform<typename FirstColliderT_::math_vector_type>, class SecondTransformT_ = empty_transform<typename SecondColliderT_::math_vector_type>>
     [[nodiscard]] static typename FirstColliderT_::math_vector_type support(
+            const typename FirstColliderT_::math_vector_type& direction,
             const FirstColliderT_& first,
             const SecondColliderT_& second,
-            const typename FirstColliderT_::math_vector_type& direction) {
+            const FirstTransformT_& firstTransform = FirstTransformT_{},
+            const SecondTransformT_& secondTransform  = SecondTransformT_{}) {
         static_assert(is_realy_the_same<typename FirstColliderT_::math_vector_type, typename SecondColliderT_::math_vector_type>::value, "FirstColliderT_::math_vector_type and SecondColliderT_::math_vector_type must be equal");
-        return first.get_furthest_point(direction) - second.get_furthest_point(-direction);
+        return first.get_furthest_point(direction, firstTransform) - second.get_furthest_point(-direction, secondTransform);
     }
 
     /**
@@ -679,87 +995,76 @@ namespace sgjk  {
     template<class MathVector2DT_>
     struct collision_detecter_2dt final {
         private:
-        typedef MathVector2DT_ math_vector2d;
+        typedef MathVector2DT_ math_vector_type;
         typedef typename MathVector2DT_::value_type scalar_type;
         
         private:
         SGJK_SIZE_TYPE iteration_;
-        math_vector2d simplex_[3u];
+        math_vector_type simplex_[3u];
 
         public:
         /**  
          * @brief Checks for collision between 2D colliders. Does not check the validity of the colliders before starting the algorithm. Check 'is_collide' for safety.
          * 
-         * @tparam FirstCollider2DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider2DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @tparam FirstCollider2DT_ the first type of collider. Must have method "get_furthest_point" that do not modify the object's state.
+         * @tparam SecondCollider2DT_ the second type of collider. Must have method "get_furthest_point" that do not modify the object's state.
          * @param first first collider.
          * @param second second collider.
          * @param maxIterationCount the maximum number of iterations, after which false will be returned.
          * @return Whether a collision is present.
          */ 
-        template<class FirstCollider2DT_, class SecondCollider2DT_>
+        template<class FirstCollider2DT_, class SecondCollider2DT_, class FirstTransform2DT_ = empty_transform<math_vector_type>, class SecondTransform2DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide_unsafe(
             const FirstCollider2DT_& first,
-            const SecondCollider2DT_& second, 
-            const SGJK_SIZE_TYPE maxIterationCount = 16) {
+            const SecondCollider2DT_& second,
+            const SGJK_SIZE_TYPE maxIterationCount = 16,
+            const FirstTransform2DT_& firstTransform = FirstTransform2DT_{},
+            const SecondTransform2DT_& secondTransform = SecondTransform2DT_{}) {
 
-            static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector2d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector2d>::value, "vector types must be the same");
-
-            /// Оно работает ПОДОЗРИТЕЛЬНО ХОРОШО. Мне СТРАШНО. TODO: Сделать этот метод хуже
-            // GJK не должен находить правильный ответ с 1 итерации гарантировано, с моим кодом что-то явно не так.
+            static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector_type>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector_type>::value, "vector types must be the same");
 
             iteration_ = 0;
 
-            math_vector2d direction = first.get_some_point() - second.get_some_point();
-            if (direction == math_vector2d(0, 0)) { // if colliders intersect, then simplex must be valid. Fill simplex with something. 
-                simplex_[0] = support(first, second, math_vector2d(1, 0));
-                simplex_[1] = support(first, second, -simplex_[0]);
-                const math_vector2d ab = simplex_[1] - simplex_[0];
-                const math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
-                simplex_[2] = support(first, second, abPerp);
-                return true;
-            }
-            math_vector2d supportPoint = support(first, second, direction);
+            math_vector_type direction = first.get_some_point(firstTransform) - second.get_some_point(secondTransform);
+            math_vector_type supportPoint = support(direction, first, second, firstTransform, secondTransform);
             simplex_[0] = supportPoint;
             SGJK_SIZE_TYPE simplexSize = 1;
             direction = -supportPoint;
 
             for (; iteration_ < maxIterationCount; ++iteration_) {
-                supportPoint = support(first, second, direction);
+                supportPoint = support(direction, first, second, firstTransform, secondTransform);
+                /// Оно работает ПОДОЗРИТЕЛЬНО ХОРОШО. Мне СТРАШНО. TODO: Сделать этот метод хуже
+                /// GJK не должен находить правильный ответ с 1 итерации гарантировано, с моим кодом что-то явно не так.
+
                 if (SGJK_DOT(supportPoint, direction) <= (scalar_type)0)
-                    return false;
+                    return false; // false
                 simplex_[simplexSize] = supportPoint;
                 ++simplexSize;
                 if (simplexSize == 2) {
-                    const math_vector2d ao = -simplex_[0];
-                    const math_vector2d ab = simplex_[1] - simplex_[0];
-                    math_vector2d abPerp = math_vector2d(-ab.y, ab.x);
+                    const math_vector_type ao = -simplex_[0];
+                    const math_vector_type ab = simplex_[1] - simplex_[0];
+                    math_vector_type abPerp = math_vector_type(-ab.y, ab.x);
                     if (SGJK_DOT(abPerp, ao) < (scalar_type)0)
                         abPerp = -abPerp;
                     direction = abPerp;
-
                 } else if (simplexSize == 3) {
-                    const math_vector2d ab = simplex_[1] - simplex_[0];
-                    const math_vector2d ao = -simplex_[0];
-                    const math_vector2d bc = simplex_[2] - simplex_[1];
-                    const math_vector2d bo = -simplex_[1];
-                    const math_vector2d ca = simplex_[0] - simplex_[2];
-                    const math_vector2d co = -simplex_[2];
-
-
+                    const math_vector_type ab = simplex_[1] - simplex_[0];
+                    const math_vector_type ao = -simplex_[0];
+                    const math_vector_type bc = simplex_[2] - simplex_[1];
+                    const math_vector_type bo = -simplex_[1];
+                    const math_vector_type ca = simplex_[0] - simplex_[2];
+                    const math_vector_type co = -simplex_[2];
                     if ((SGJK_CROSS(ab, ao) >= (scalar_type)0 && SGJK_CROSS(bc, bo) >= (scalar_type)0 && SGJK_CROSS(ca, co) >= (scalar_type)0) ||
                         (SGJK_CROSS(ab, ao) <= (scalar_type)0 && SGJK_CROSS(bc, bo) <= (scalar_type)0 && SGJK_CROSS(ca, co) <= (scalar_type)0)) {
                         return true;
                     } else {
                         simplex_[1] = simplex_[0];
                         simplex_[0] = simplex_[2];
-                        //simplexSize = 1;
-                        //direction = simplex_[0];
                         simplexSize = 2;
-                        const math_vector2d aon = -simplex_[0];
-                        const math_vector2d abn = simplex_[1] - simplex_[0];
-                        math_vector2d abnPerp = math_vector2d(-abn.y, abn.x);
+                        const math_vector_type aon = -simplex_[0];
+                        const math_vector_type abn = simplex_[1] - simplex_[0];
+                        math_vector_type abnPerp = math_vector_type(-abn.y, abn.x);
                         if (SGJK_DOT(abnPerp, aon) < (scalar_type)0)
                             abnPerp = -abnPerp;
                         direction = abnPerp;
@@ -774,57 +1079,61 @@ namespace sgjk  {
         /**  
          * @brief Checks for collision between 2D colliders. Checks the validity of the colliders before starting the algorithm.
          * 
-         * @tparam FirstCollider2DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider2DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @tparam FirstCollider2DT_ the first type of collider. Must have method and "get_furthest_point" that do not modify the object's state.
+         * @tparam SecondCollider2DT_ the second type of collider. Must have method "get_furthest_point" that do not modify the object's state.
          * @param first first collider.
          * @param second second collider.
          * @param maxIterationCount the maximum number of iterations, after which false will be returned.
          * @return Whether a collision is present.
          */ 
-        template<class FirstCollider2DT_, class SecondCollider2DT_>
+        template<class FirstCollider2DT_, class SecondCollider2DT_, class FirstTransform2DT_ = empty_transform<math_vector_type>, class SecondTransform2DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide(
             const FirstCollider2DT_& first,
-            const SecondCollider2DT_& second, 
-            const SGJK_SIZE_TYPE maxIterationCount = 16) {
+            const SecondCollider2DT_& second,
+            const SGJK_SIZE_TYPE maxIterationCount = 16,
+            const FirstTransform2DT_& firstTransform = FirstTransform2DT_{},
+            const SecondTransform2DT_& secondTransform = SecondTransform2DT_{}) {
 
-            static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector2d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector2d>::value, "vector types must be the same");
+            static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector_type>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector_type>::value, "vector types must be the same");
             
             if (!(first.is_valid() && second.is_valid())) {
                 iteration_ = 0;
                 return false;
             }
 
-            return is_collide_unsafe(first, second, maxIterationCount);
+            return is_collide_unsafe(first, second, maxIterationCount, firstTransform, secondTransform);
         }
-        template<class FirstCollider2DT_, class SecondCollider2DT_>
-        [[nodiscard]] math_vector2d get_penetration_vector_unsafe(
+        template<class FirstCollider2DT_, class SecondCollider2DT_, class FirstTransform2DT_ = empty_transform<math_vector_type>, class SecondTransform2DT_ = empty_transform<math_vector_type>>
+        [[nodiscard]] math_vector_type get_penetration_vector_unsafe(
             const FirstCollider2DT_& first,
             const SecondCollider2DT_& second, 
             const scalar_type toleranceDistance = 0.001,
-            const SGJK_SIZE_TYPE maxIterationCount = 16) {
+            const SGJK_SIZE_TYPE maxIterationCount = 16,
+            const FirstTransform2DT_& firstTransform = FirstTransform2DT_{},
+            const SecondTransform2DT_& secondTransform = SecondTransform2DT_{}) {
 
-            static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector2d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector2d>::value, "vector types must be the same");
+            static_assert(is_realy_the_same<typename FirstCollider2DT_::math_vector_type, math_vector_type>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider2DT_::math_vector_type, math_vector_type>::value, "vector types must be the same");
 
             iteration_ = 0;
 
             SGJK_SIZE_TYPE minIndex = 0;
             scalar_type minDistance = SGJK_MAX_VALUE_OF(scalar_type);
-            math_vector2d minNormal;
+            math_vector_type minNormal;
 
-            SGJK_DEFAULT_CONTAINER<math_vector2d> polytope(simplex_, simplex_ + 3);
+            SGJK_DEFAULT_CONTAINER<math_vector_type> polytope(simplex_, simplex_ + 3);
 
             for (; (iteration_ < maxIterationCount) && (minDistance == SGJK_MAX_VALUE_OF(scalar_type)); ++iteration_) {
                 for (SGJK_SIZE_TYPE i = 0; i < polytope.size(); ++i) {
                     SGJK_SIZE_TYPE j = (i + 1) % polytope.size();
 
-                    const math_vector2d vertexI = polytope[i];
-                    const math_vector2d vertexJ = polytope[j];
+                    const math_vector_type vertexI = polytope[i];
+                    const math_vector_type vertexJ = polytope[j];
 
-                    const math_vector2d ij = vertexJ - vertexI;
+                    const math_vector_type ij = vertexJ - vertexI;
 
-                    math_vector2d normal = SGJK_NORMALIZED(math_vector2d(-ij.y, ij.x));
+                    math_vector_type normal = SGJK_NORMALIZED(math_vector_type(-ij.y, ij.x));
                     scalar_type distance = SGJK_DOT(normal, vertexI);
 
                     if (distance < (scalar_type)0) {
@@ -838,7 +1147,7 @@ namespace sgjk  {
                         minIndex = j;
                     }
                 }
-                const math_vector2d supportPoint = support(first, second, minNormal);
+                const math_vector_type supportPoint = support(minNormal, first, second, firstTransform, secondTransform);
                 const scalar_type sDistance = SGJK_DOT(minNormal, supportPoint);
 
                 if (SGJK_ABS(sDistance - minDistance) > toleranceDistance) {
@@ -846,7 +1155,6 @@ namespace sgjk  {
                     polytope.insert(polytope.begin() + minIndex, {supportPoint});
                 }
             }
-            
 
             return minNormal * (minDistance + toleranceDistance);
         }
@@ -854,11 +1162,12 @@ namespace sgjk  {
         [[nodiscard]] SGJK_SIZE_TYPE get_iteration_count() const noexcept {
             return iteration_ + 1;
         }
-        [[nodiscard]] const math_vector2d* get_simplex_data() const noexcept {
+        [[nodiscard]] const math_vector_type* get_simplex_data() const noexcept {
             return simplex_;
         }
     };
     typedef collision_detecter_2dt<SGJK_DEFAULT_VEC2D> collision_detecter_2d;
+
     /**
      * @brief a collision detector for 3D vectors.
      *
@@ -867,70 +1176,60 @@ namespace sgjk  {
     template<class MathVector3DT_>
     struct collision_detecter_3dt final {
         private:
-        typedef MathVector3DT_ math_vector3d;
+        typedef MathVector3DT_ math_vector_type;
         typedef typename MathVector3DT_::value_type scalar_type;
         
         private:
         SGJK_SIZE_TYPE iteration_;
-        math_vector3d simplex_[4u];
+        math_vector_type simplex_[4u];
 
         public:
         /**  
          * @brief Checks for collision between 3D colliders. Does not check the validity of the colliders before starting the algorithm. Check 'is_collide' for safety.
          * 
-         * @tparam FirstCollider3DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider3DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @tparam FirstCollider3DT_ the first type of collider. Must have method  and "get_furthest_point" that do not modify the object's state.
+         * @tparam SecondCollider3DT_ the second type of collider. Must have method  and "get_furthest_point" that do not modify the object's state.
          * @param first first collider.
          * @param second second collider.
          * @param maxIterationCount the maximum number of iterations, after which false will be returned.
          * @return Whether a collision is present.
          */ 
-        template<class FirstCollider3DT_, class SecondCollider3DT_>
+        template<class FirstCollider3DT_, class SecondCollider3DT_, class FirstTransform3DT_ = empty_transform<math_vector_type>, class SecondTransform3DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide_unsafe(
             const FirstCollider3DT_& first,
             const SecondCollider3DT_& second, 
-            const SGJK_SIZE_TYPE maxIterationCount = 32) {
+            const SGJK_SIZE_TYPE maxIterationCount = 32,
+            const FirstTransform3DT_& firstTransform = FirstTransform3DT_{},
+            const SecondTransform3DT_& secondTransform = SecondTransform3DT_{}) {
 
-            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
+            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector_type>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector_type>::value, "vector types must be the same");
 
             iteration_ = 0;
 
-            math_vector3d direction = first.get_some_point() - second.get_some_point();
-            if (direction == math_vector3d(0, 0, 0)) { // if colliders intersect, then simplex must be valid. Fill simplex with something. 
-                simplex_[0] = support(first, second,  math_vector3d(1, 0, 0));
-                simplex_[1] = support(first, second, -simplex_[0]);
-
-                const math_vector3d ab = simplex_[1] - simplex_[0];
-                const math_vector3d abPerp = math_vector3d(-ab.y, ab.x, ab.z);
-                simplex_[2] = support(first, second, abPerp);
-
-                const math_vector3d ac = simplex_[2] - simplex_[0];
-                simplex_[3] = support(first, second, SGJK_CROSS(ab, ac));
-                return true;
-            }
-            math_vector3d supportPoint = support(first, second, direction);
+            math_vector_type direction = first.get_some_point(firstTransform) - second.get_some_point(secondTransform);
+            math_vector_type supportPoint = support(direction, first, second, firstTransform, secondTransform);
             simplex_[0] = supportPoint;
             SGJK_SIZE_TYPE simplexSize = 1;
             direction = -supportPoint;
 
             for (; iteration_ < maxIterationCount; ++iteration_) {
-                supportPoint = support(first, second, direction);
+                supportPoint = support(direction, first, second, firstTransform, secondTransform);
                 if (SGJK_DOT(supportPoint, direction) <= (scalar_type)0) {
                     return false;
                 }
                 simplex_[simplexSize] = supportPoint;
                 ++simplexSize;
                 if (simplexSize == 2) {
-                    const math_vector3d ab = simplex_[1] - simplex_[0];
-                    const math_vector3d ao = -simplex_[0];
+                    const math_vector_type ab = simplex_[1] - simplex_[0];
+                    const math_vector_type ao = -simplex_[0];
                     if (SGJK_DOT(ab, ao) > 0) {
                         direction = SGJK_CROSS(SGJK_CROSS(ab, ao), ab);
-                        if (direction == math_vector3d(0, 0, 0)) { // paralel vectors. Collision detect. If colliders intersect, then simplex must be valid. Fill simplex with something. 
-                            const math_vector3d abPerp = math_vector3d(-ab.y, ab.x, ab.z);
-                            simplex_[2] = support(first, second, abPerp);
-                            const math_vector3d ac = simplex_[2] - simplex_[0];
-                            simplex_[3] = support(first, second, SGJK_CROSS(ab, ac));
+                        if (direction == math_vector_type(0, 0, 0)) { // paralel vectors. Collision detect. If colliders intersect, then simplex must be valid. Fill simplex with something. 
+                            const math_vector_type abPerp = math_vector_type(-ab.y, ab.x, ab.z);
+                            simplex_[2] = support(abPerp, first, second, firstTransform, secondTransform);
+                            const math_vector_type ac = simplex_[2] - simplex_[0];
+                            simplex_[3] = support(SGJK_CROSS(ab, ac), first, second, firstTransform, secondTransform);
                             return true;
                         }
                     } else {
@@ -940,22 +1239,22 @@ namespace sgjk  {
                     }
                     
                 } else if (simplexSize == 3) {
-                    const math_vector3d ao = -simplex_[0];
-                    const math_vector3d ac = simplex_[2] - simplex_[0];
-                    const math_vector3d ab = simplex_[1] - simplex_[0];
+                    const math_vector_type ao = -simplex_[0];
+                    const math_vector_type ac = simplex_[2] - simplex_[0];
+                    const math_vector_type ab = simplex_[1] - simplex_[0];
                     direction = SGJK_CROSS(ac, ab);
 
                     if (SGJK_DOT(direction, ao) < (scalar_type)0) 
                         direction = -direction;
                 } else if (simplexSize == 4) {
-                    const math_vector3d da = simplex_[3] - simplex_[0];
-                    const math_vector3d db = simplex_[3] - simplex_[1];
-                    const math_vector3d dc = simplex_[3] - simplex_[2];
-                    const math_vector3d d0 = -simplex_[3];
+                    const math_vector_type da = simplex_[3] - simplex_[0];
+                    const math_vector_type db = simplex_[3] - simplex_[1];
+                    const math_vector_type dc = simplex_[3] - simplex_[2];
+                    const math_vector_type d0 = -simplex_[3];
 
-                    const math_vector3d abdPerp = SGJK_CROSS(da, db);
-                    const math_vector3d bcdPerp = SGJK_CROSS(db, dc);
-                    const math_vector3d cadPerp = SGJK_CROSS(dc, da);
+                    const math_vector_type abdPerp = SGJK_CROSS(da, db);
+                    const math_vector_type bcdPerp = SGJK_CROSS(db, dc);
+                    const math_vector_type cadPerp = SGJK_CROSS(dc, da);
 
                     if (SGJK_DOT(abdPerp, d0) > (scalar_type)0) {
                         simplex_[2] = simplex_[3];
@@ -985,39 +1284,43 @@ namespace sgjk  {
         /**  
          * @brief Checks for collision between 3D colliders. Checks the validity of the colliders before starting the algorithm.
          * 
-         * @tparam FirstCollider3DT_ the first type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
-         * @tparam SecondCollider3DT_ the second type of collider. Must have methods "get_some_point" and "get_furthest_point" that do not modify the object's state.
+         * @tparam FirstCollider3DT_ the first type of collider. Must have method and "get_furthest_point" that do not modify the object's state.
+         * @tparam SecondCollider3DT_ the second type of collider. Must have method  and "get_furthest_point" that do not modify the object's state.
          * @param first first collider.
          * @param second second collider.
          * @param maxIterationCount the maximum number of iterations, after which false will be returned.
          * @return Whether a collision is present.
          */ 
-        template<class FirstCollider3DT_, class SecondCollider3DT_>
+        template<class FirstCollider3DT_, class SecondCollider3DT_, class FirstTransform3DT_ = empty_transform<math_vector_type>, class SecondTransform3DT_ = empty_transform<math_vector_type>>
         [[nodiscard]] bool is_collide(
             const FirstCollider3DT_& first,
             const SecondCollider3DT_& second, 
-            const SGJK_SIZE_TYPE maxIterationCount = 32) {
+            const SGJK_SIZE_TYPE maxIterationCount = 32,
+            const FirstTransform3DT_& firstTransform = FirstTransform3DT_{},
+            const SecondTransform3DT_& secondTransform = SecondTransform3DT_{}) {
 
-            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
+            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector_type>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector_type>::value, "vector types must be the same");
             
             if (!(first.is_valid() && second.is_valid())) {
                 iteration_ = 0;
                 return false;
             }
 
-            return is_collide_unsafe(first, second, maxIterationCount);
+            return is_collide_unsafe(first, second, maxIterationCount, firstTransform, secondTransform);
         }
 
-        template<class FirstCollider3DT_, class SecondCollider3DT_>
-        [[nodiscard]] math_vector3d get_penetration_vector_unsafe(
+        template<class FirstCollider3DT_, class SecondCollider3DT_, class FirstTransform3DT_ = empty_transform<math_vector_type>, class SecondTransform3DT_ = empty_transform<math_vector_type>>
+        [[nodiscard]] math_vector_type get_penetration_vector_unsafe(
             const FirstCollider3DT_& first,
             const SecondCollider3DT_& second, 
             const scalar_type toleranceDistance = 0.001,
-            const SGJK_SIZE_TYPE maxIterationCount = 32) {
+            const SGJK_SIZE_TYPE maxIterationCount = 32,
+            const FirstTransform3DT_& firstTransform = FirstTransform3DT_{},
+            const SecondTransform3DT_& secondTransform = SecondTransform3DT_{}) {
 
-            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector3d>::value,  "vector types must be the same");
-            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector3d>::value, "vector types must be the same");
+            static_assert(is_realy_the_same<typename FirstCollider3DT_::math_vector_type, math_vector_type>::value,  "vector types must be the same");
+            static_assert(is_realy_the_same<typename SecondCollider3DT_::math_vector_type, math_vector_type>::value, "vector types must be the same");
 
             const auto addEndgeIfUnique = [](SGJK_DEFAULT_CONTAINER<single_t_pair<SGJK_SIZE_TYPE>>& edges, SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE>& faces, SGJK_SIZE_TYPE i, SGJK_SIZE_TYPE j) {
                 const auto simpleFind = [](const SGJK_DEFAULT_CONTAINER<single_t_pair<SGJK_SIZE_TYPE>>& edges, SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE>& faces, SGJK_SIZE_TYPE i, SGJK_SIZE_TYPE j) {
@@ -1037,18 +1340,18 @@ namespace sgjk  {
                     edges.push_back(single_t_pair<SGJK_SIZE_TYPE>(faces[i], faces[j]));
             };
 
-            /// @return simple_pair<SGJK_DEFAULT_CONTAINER<simple_pair<math_vector3d, scalar_type>>, SGJK_SIZE_TYPE> 
-            const auto getFaceNormals = [](const SGJK_DEFAULT_CONTAINER<math_vector3d>& polytope, const SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE>& faces) {
-                SGJK_DEFAULT_CONTAINER<simple_pair<math_vector3d, scalar_type>> normals;
+            /// @return simple_pair<SGJK_DEFAULT_CONTAINER<simple_pair<math_vector_type, scalar_type>>, SGJK_SIZE_TYPE> 
+            const auto getFaceNormals = [](const SGJK_DEFAULT_CONTAINER<math_vector_type>& polytope, const SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE>& faces) {
+                SGJK_DEFAULT_CONTAINER<simple_pair<math_vector_type, scalar_type>> normals;
                 SGJK_SIZE_TYPE minTriangle = 0;
                 scalar_type minDistance = SGJK_MAX_VALUE_OF(scalar_type);
 
                 for (SGJK_SIZE_TYPE i = 0; i < faces.size(); i += 3) {
-                    const math_vector3d& a = polytope[faces[i]];
-                    const math_vector3d& b = polytope[faces[i + 1]];
-                    const math_vector3d& c = polytope[faces[i + 2]];
+                    const math_vector_type& a = polytope[faces[i]];
+                    const math_vector_type& b = polytope[faces[i + 1]];
+                    const math_vector_type& c = polytope[faces[i + 2]];
 
-                    math_vector3d normal = SGJK_NORMALIZED(SGJK_CROSS((b - a), (c - a)));
+                    math_vector_type normal = SGJK_NORMALIZED(SGJK_CROSS((b - a), (c - a)));
                     float distance = SGJK_DOT(normal, a);
 
                     if (distance < (scalar_type)0) {
@@ -1056,19 +1359,19 @@ namespace sgjk  {
                         distance = -distance;
                     }
 
-                    normals.push_back(simple_pair<math_vector3d, scalar_type>{normal, distance});
+                    normals.push_back(simple_pair<math_vector_type, scalar_type>{normal, distance});
             
                     if (distance < minDistance) {
                         minTriangle = i / 3;
                         minDistance = distance;
                     }
                 }
-                return simple_pair<SGJK_DEFAULT_CONTAINER<simple_pair<math_vector3d, scalar_type>>, SGJK_SIZE_TYPE>(normals, minTriangle);
+                return simple_pair<SGJK_DEFAULT_CONTAINER<simple_pair<math_vector_type, scalar_type>>, SGJK_SIZE_TYPE>(normals, minTriangle);
             };
 
             iteration_ = 0;
 
-            SGJK_DEFAULT_CONTAINER<math_vector3d> polytope(simplex_, simplex_ + 4);
+            SGJK_DEFAULT_CONTAINER<math_vector_type> polytope(simplex_, simplex_ + 4);
             SGJK_DEFAULT_CONTAINER<SGJK_SIZE_TYPE> faces{
                 0, 1, 2,
                 0, 3, 1,
@@ -1077,7 +1380,7 @@ namespace sgjk  {
             };
 
             scalar_type minDistance = SGJK_MAX_VALUE_OF(scalar_type);
-            math_vector3d minNormal;
+            math_vector_type minNormal;
 
             auto defaultNormalsData = getFaceNormals(polytope, faces);
             auto& normals = defaultNormalsData.first;
@@ -1087,7 +1390,7 @@ namespace sgjk  {
                 minNormal = normals[minFace].first;
                 minDistance = normals[minFace].second;
 
-                const math_vector3d supportPoint = support(first, second, minNormal);
+                const math_vector_type supportPoint = support(minNormal, first, second, firstTransform, secondTransform);
                 const scalar_type sDistance = SGJK_DOT(minNormal, supportPoint);
 
                 if (SGJK_ABS(sDistance - minDistance) > toleranceDistance) {
@@ -1150,7 +1453,7 @@ namespace sgjk  {
         [[nodiscard]] SGJK_SIZE_TYPE get_iteration_count() const noexcept {
             return iteration_ + 1;
         }
-        [[nodiscard]] const math_vector3d* get_simplex_data() const noexcept {
+        [[nodiscard]] const math_vector_type* get_simplex_data() const noexcept {
             return simplex_;
         }
     };
