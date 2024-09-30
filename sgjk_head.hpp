@@ -64,7 +64,7 @@
 
 #if (!(defined SGJK_SIN))
 #   include <cmath>
-#   define SGJK_SIN(val__) (::std::cos(val__))
+#   define SGJK_SIN(val__) (::std::sin(val__))
 #endif // !defined SGJK_SIN
 
 #if (!(defined SGKJ_NOT_IMPLEMENT_VECTORS)) /////////////////////////////////////////////////////////////
@@ -756,7 +756,7 @@ namespace sgjk  {
             return radians_;
         }
     };
-    /// @brief specialization of transform_3dt for default vector2d class.
+    /// @brief specialization of transform_2dt for default vector2d class.
     typedef transform_2dt<SGJK_DEFAULT_VEC2D> transform2d;
 
     /**
@@ -1685,5 +1685,4 @@ namespace sgjk  {
     };
     typedef collision_detecter_3dt<SGJK_DEFAULT_VEC3D> collision_detecter_3d;
 };
-
 #endif // ifndef SGJK_HEAD_HPP_
