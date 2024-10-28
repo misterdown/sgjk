@@ -717,6 +717,12 @@ namespace sgjk  {
         transform_2dt(const math_vector_type& position, const scalar_type& radians) : position_(position), radians_(radians) {
 
         }
+        transform_2dt(const transform_2dt& other) : position_(other.position_), radians_(other.radians_) {
+
+        }
+        transform_2dt(transform_2dt&& other) : position_(SGJK_MOVE(other.position_)), radians_(SGJK_MOVE(other.radians_)) {
+
+        }
 
         public:
         /**
@@ -778,6 +784,12 @@ namespace sgjk  {
 
         }
         transform_3dt(const math_vector_type& position, const math_vector_type& radians) : position_(position), radians_(radians) {
+
+        }
+        transform_3dt(const transform_3dt& other) : position_(other.position_), radians_(other.radians_) {
+
+        }
+        transform_3dt(transform_3dt&& other) : position_(SGJK_MOVE(other.position_)), radians_(SGJK_MOVE(other.radians_)) {
 
         }
 
@@ -886,14 +898,6 @@ namespace sgjk  {
         collider_wrapper_anyd() noexcept : wrapped_(nullptr) {
 
         }
-        collider_wrapper_anyd(const collider_wrapper_anyd& other) {
-            if (other.wrapped_ != nullptr) {
-                wrapped_ = other.wrapped_->clone();
-                SGJK_ASSERT(wrapped_ != nullptr);
-            } else {
-                wrapped_ = nullptr;
-            }
-        }
         collider_wrapper_anyd(collider_wrapper_anyd&& other) noexcept : wrapped_(other.wrapped_) {
             other.wrapped_ = nullptr;
         }
@@ -905,6 +909,14 @@ namespace sgjk  {
         template<class ColliderT_>
         collider_wrapper_anyd(typename really_remove_referens<ColliderT_>::type&& collider) noexcept : wrapped_(new collider_wrapper_support_t<ColliderT_>(SGJK_MOVE(collider))) {
             static_assert(is_realy_the_same<typename ColliderT_::math_vector_type, math_vector_type>::value, "math_vector_type of collider must be same as math_vector_type of wrapper");
+        }
+        collider_wrapper_anyd(const collider_wrapper_anyd& other) {
+            if (other.wrapped_ != nullptr) {
+                wrapped_ = other.wrapped_->clone();
+                SGJK_ASSERT(wrapped_ != nullptr);
+            } else {
+                wrapped_ = nullptr;
+            }
         }
 
         public:
@@ -1685,4 +1697,5 @@ namespace sgjk  {
     };
     typedef collision_detecter_3dt<SGJK_DEFAULT_VEC3D> collision_detecter_3d;
 };
+
 #endif // ifndef SGJK_HEAD_HPP_
