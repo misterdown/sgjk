@@ -708,19 +708,20 @@ namespace sgjk  {
 
         private:
         math_vector_type position_;
+        math_vector_type scale_;
         scalar_type radians_;
 
         public:
-        transform_2dt() : position_(), radians_() {
+        transform_2dt() : position_(), radians_(), scale_(1, 1) {
 
         }
-        transform_2dt(const math_vector_type& position, const scalar_type& radians) : position_(position), radians_(radians) {
+        transform_2dt(const math_vector_type& position, const scalar_type& radians, const math_vector_type& scale = math_vector_type(1, 1)) : position_(position), scale_(scale), radians_(radians) {
 
         }
-        transform_2dt(const transform_2dt& other) : position_(other.position_), radians_(other.radians_) {
+        transform_2dt(const transform_2dt& other) : position_(other.position_), scale_(other.scale_), radians_(other.radians_) {
 
         }
-        transform_2dt(transform_2dt&& other) : position_(SGJK_MOVE(other.position_)), radians_(SGJK_MOVE(other.radians_)) {
+        transform_2dt(transform_2dt&& other) : position_(SGJK_MOVE(other.position_)), scale_(SGJK_MOVE(other.scale_)), radians_(SGJK_MOVE(other.radians_)) {
 
         }
 
@@ -737,7 +738,7 @@ namespace sgjk  {
             return math_vector_type(
                 cos_theta * point.x - sin_theta * point.y,
                 sin_theta * point.x + cos_theta * point.y
-            ) + position_;
+            ) * scale_ + position_;
         }
 
         public:
@@ -754,6 +755,12 @@ namespace sgjk  {
         }
         [[nodiscard]] math_vector_type& get_position() noexcept {
             return position_;
+        }
+        [[nodiscard]] const math_vector_type& get_scale() const noexcept {
+            return scale_;
+        }
+        [[nodiscard]] math_vector_type& get_scale() noexcept {
+            return scale_;
         }
         [[nodiscard]] const scalar_type& get_rotation() const noexcept {
             return radians_;
@@ -777,19 +784,20 @@ namespace sgjk  {
 
         private:
         math_vector_type position_;
+        math_vector_type scale_;
         math_vector_type radians_;
 
         public:
-        transform_3dt() : position_(), radians_() {
+        transform_3dt() : position_(), radians_(), scale(1, 1, 1) {
 
         }
-        transform_3dt(const math_vector_type& position, const math_vector_type& radians) : position_(position), radians_(radians) {
+        transform_3dt(const math_vector_type& position, const math_vector_type& radians, const math_vector_type& scale = math_vector_type(1, 1, 1)) : position_(position), scale_(scale), radians_(radians) {
 
         }
-        transform_3dt(const transform_3dt& other) : position_(other.position_), radians_(other.radians_) {
+        transform_3dt(const transform_3dt& other) : position_(other.position_), scale_(other.scale_), radians_(other.radians_) {
 
         }
-        transform_3dt(transform_3dt&& other) : position_(SGJK_MOVE(other.position_)), radians_(SGJK_MOVE(other.radians_)) {
+        transform_3dt(transform_3dt&& other) : position_(SGJK_MOVE(other.position_)), scale_(SGJK_MOVE(other.scale_)), radians_(SGJK_MOVE(other.radians_)) {
 
         }
 
@@ -821,7 +829,7 @@ namespace sgjk  {
                 (cosX * sinY * cosZ + sinX * sinZ * point.x) +
                 (cosX * sinY * sinZ - sinX * cosZ * point.y) +
                 (cosX * cosY * point.z)
-            ) + position_;
+            ) * scale_ + position_;
         }
 
         public:
@@ -838,6 +846,12 @@ namespace sgjk  {
         }
         [[nodiscard]] math_vector_type& get_position() noexcept {
             return position_;
+        }
+        [[nodiscard]] const math_vector_type& get_scale() const noexcept {
+            return scale_;
+        }
+        [[nodiscard]] math_vector_type& get_scale() noexcept {
+            return scale_;
         }
         [[nodiscard]] const math_vector_type& get_rotation() const noexcept {
             return radians_;
