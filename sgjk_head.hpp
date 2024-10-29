@@ -788,7 +788,7 @@ namespace sgjk  {
         math_vector_type radians_;
 
         public:
-        transform_3dt() : position_(), radians_(), scale(1, 1, 1) {
+        transform_3dt() : position_(), radians_(), scale_(1, 1, 1) {
 
         }
         transform_3dt(const math_vector_type& position, const math_vector_type& radians, const math_vector_type& scale = math_vector_type(1, 1, 1)) : position_(position), scale_(scale), radians_(radians) {
