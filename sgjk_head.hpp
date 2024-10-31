@@ -731,14 +731,16 @@ namespace sgjk  {
          * @param point The point to transform.
          * @return The transformed point.
          */
-        [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
+        [[nodiscard]] math_vector_type transformed(math_vector_type point) const noexcept {
             const scalar_type cos_theta = SGJK_COS(radians_);
             const scalar_type sin_theta = SGJK_SIN(radians_);
+
+            point *= scale_;
 
             return math_vector_type(
                 cos_theta * point.x - sin_theta * point.y,
                 sin_theta * point.x + cos_theta * point.y
-            ) * scale_ + position_;
+            ) + position_;
         }
 
         public:
@@ -807,7 +809,7 @@ namespace sgjk  {
          * @param point The point to transform.
          * @return The transformed point.
          */
-        [[nodiscard]] math_vector_type transformed(const math_vector_type& point) const noexcept {
+        [[nodiscard]] math_vector_type transformed(math_vector_type point) const noexcept {
             // Dear compiler, PLEASE, optimize this
             const scalar_type cosX = SGJK_COS(radians_.x);
             const scalar_type sinX = SGJK_SIN(radians_.x);
@@ -815,6 +817,8 @@ namespace sgjk  {
             const scalar_type sinY = SGJK_SIN(radians_.y);
             const scalar_type cosZ = SGJK_COS(radians_.z);
             const scalar_type sinZ = SGJK_SIN(radians_.z);
+
+            point *= scale_;
 
             // MUHAHA. im crying.
             return math_vector_type(
@@ -829,7 +833,7 @@ namespace sgjk  {
                 (cosX * sinY * cosZ + sinX * sinZ * point.x) +
                 (cosX * sinY * sinZ - sinX * cosZ * point.y) +
                 (cosX * cosY * point.z)
-            ) * scale_ + position_;
+            ) + position_;
         }
 
         public:
